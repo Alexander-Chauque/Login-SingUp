@@ -3,58 +3,80 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } fro
 import { FontAwesome } from '@expo/vector-icons';
 import { auth } from '../src/config/firebaseConfig';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { signUpStyles as styles} from '../styles/signUpStyles';
+import { COLORS } from '../styles/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function SignUp({ navigation }) {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [dni, setDni] = useState('');
   const [email, setEmail] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSignUp = async () => {
-    if (!firstName.trim() || !lastName.trim() || !email.trim() || !password || !confirmPassword) {
-      Alert.alert("Error", "Todos los campos son obligatorios.");
-      return;
-    }
+  setErrorMessage('');
 
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Las contraseñas no coinciden.");
-      return;
-    }
+  // Validar que todos los campos estén completos
+  if (!nombre.trim() || !apellido.trim() || !dni.trim() || !email.trim() || !telefono.trim() || !password || !confirmPassword) {
+    setErrorMessage("Todos los campos son obligatorios.");
+    return;
+  }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
-    if (!passwordRegex.test(password)) {
-      Alert.alert(
-        "Error",
-        "La contraseña debe tener al menos 6 caracteres, incluyendo una letra mayúscula, una minúscula y un número."
-      );
-      return;
-    }
+  // Validar formato de correo
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim())) {
+    setErrorMessage("Ingrese un correo electrónico válido.");
+    return;
+  }
 
-    let credential;
-    try {
-      credential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-    } catch (error) {
-      console.error('Error de registro:', error.code, error.message);
-      let errorMessage = "Hubo un problema al registrar el usuario.";
-      switch (error.code) {
-        case 'auth/email-already-in-use':
-          errorMessage = "El correo electrónico ya está en uso.";
-          break;
-        case 'auth/invalid-email':
-          errorMessage = "El formato del correo electrónico no es válido.";
-          break;
-        case 'auth/weak-password':
-          errorMessage = "La contraseña es demasiado débil.";
-          break;
-        case 'auth/network-request-failed':
-          errorMessage = "Error de conexión, por favor intenta más tarde.";
-          break;
-        case 'auth/invalid-api-key':
-          errorMessage = "La clave API de Firebase no es válida. Revisa el archivo .env.";
-          break;
+  // Validar contraseña segura
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    setErrorMessage("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.");
+    return;
+  }
+
+  // Validar que las contraseñas coincidan
+  if (password !== confirmPassword) {
+    setErrorMessage("Las contraseñas no coinciden.");
+    return;
+  }
+
+  setIsLoading(true);
+
+  try {
+    // Crear usuario en Firebase
+    const credential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+
+    // Guardar el nombre completo del usuario
+    await updateProfile(credential.user, {
+      displayName: `${nombre.trim()} ${apellido.trim()}`,
+    });
+
+    Alert.alert("Registro exitoso", "Usuario registrado con éxito.");
+    // El observador de Firebase redirige al Home
+  } catch (error) {
+    let errorMessage = "Hubo un problema al registrar el usuario.";
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        errorMessage = "El correo electrónico ya está en uso.";
+        break;
+      case 'auth/invalid-email':
+        errorMessage = "El formato del correo electrónico no es válido.";
+        break;
+      case 'auth/weak-password':
+        errorMessage = "La contraseña es demasiado débil.";
+        break;
+      case 'auth/network-request-failed':
+        errorMessage = "Error de conexión, por favor intenta más tarde.";
+        break;
       }
       Alert.alert("Error", `${errorMessage}\n\nCódigo: ${error.code ?? 'desconocido'}`);
       return;
@@ -70,139 +92,130 @@ export default function SignUp({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
-      <Text style={styles.title}>Regístrate</Text>
+    <LinearGradient
+      colors={['#4A4A4A', '#E89B3C', '#D18A2E']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
+      <View style={styles.card}>
+        <Image source={require('../assets/logo.jpg')} style={styles.logo} />
+        <Text style={styles.title}>Crear cuenta</Text>
 
-      <Text style={styles.label}>Nombre</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="user" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Ingrese su nombre"
-          value={firstName}
-          onChangeText={setFirstName}
-        />
-      </View>
+        <Text style={styles.subtitle}>
+          Registrate en <Text style={styles.brandName}>LOS CARDONES</Text>
+        </Text>
 
-      <Text style={styles.label}>Apellido</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="user" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Ingrese su apellido"
-          value={lastName}
-          onChangeText={setLastName}
-        />
-      </View>
+        <Text style={styles.label}>Nombre</Text>
+        <View style={styles.inputContainer}>
+          <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Ingrese su nombre"
+            value={nombre}
+            onChangeText={setNombre}
+          />
+        </View>
 
-      <Text style={styles.label}>Correo</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="envelope" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Ingrese su correo"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </View>
+        <Text style={styles.label}>Apellido</Text>
+        <View style={styles.inputContainer}>
+          <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Ingrese su apellido"
+            value={apellido}
+            onChangeText={setApellido}
+          />
+        </View>
 
-      <Text style={styles.label}>Contraseña</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="lock" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Ingrese su contraseña"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!showPassword}
-        />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color="#ccc" />
+        <Text style={styles.label}>DNI</Text>
+        <View style={styles.inputContainer}>
+          <FontAwesome name="id-card" size={20} color={COLORS.grisMedio} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Ingrese su DNI"
+            value={dni}
+            onChangeText={setDni}
+            keyboardType="numeric"
+          />
+        </View>
+
+        <Text style={styles.label}>Correo electrónico</Text>
+        <View style={styles.inputContainer}>
+          <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Ingrese su correo"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+        </View>
+
+        <Text style={styles.label}>Teléfono</Text>
+        <View style={styles.inputContainer}>
+          <FontAwesome name="phone" size={20} color={COLORS.grisMedio} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Ingrese su teléfono"
+            value={telefono}
+            onChangeText={setTelefono}
+            keyboardType="phone-pad"
+          />
+        </View>
+
+        <Text style={styles.label}>Contraseña</Text>
+        <View style={styles.inputContainer}>
+          <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Ingrese su contraseña"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.label}>Confirmar contraseña</Text>
+        <View style={styles.inputContainer}>
+          <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirme su contraseña"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!showConfirmPassword}
+          />
+          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <FontAwesome name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
+          </TouchableOpacity>
+        </View>
+
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <FontAwesome name="exclamation-circle" size={16} color={COLORS.rojo} />
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
+
+        <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={isLoading}>
+          {isLoading ? (
+            <ActivityIndicator color={COLORS.blanco} />
+          ) : (
+            <Text style={styles.buttonText}>Registrarse</Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.signUpText}>
+            ¿Ya estás registrado? <Text style={styles.linkText}>Inicia Sesión</Text>
+          </Text>
         </TouchableOpacity>
       </View>
-
-      <Text style={styles.label}>Confirmar Contraseña</Text>
-      <View style={styles.inputContainer}>
-        <FontAwesome name="lock" size={20} color="#ccc" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirme su contraseña"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry={!showConfirmPassword}
-        />
-        <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-          <FontAwesome name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color="#ccc" />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Registrarse</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.signUpText}>¿Ya tienes cuenta? Inicia sesión</Text>
-      </TouchableOpacity>
-    </View>
+    </LinearGradient>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  label: {
-    alignSelf: 'flex-start',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: '#b9770e',
-    marginBottom: 20,
-    width: '100%',
-  },
-  icon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    height: 40,
-  },
-  button: {
-    backgroundColor: '#922b21',
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    borderRadius: 5,
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  signUpText: {
-    marginTop: 20,
-    color: '#007AFF',
-  },
-});

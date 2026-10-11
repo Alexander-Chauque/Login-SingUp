@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
 import { loginStyles as styles } from '../styles/loginStyles';
-import { ActivityIndicator } from 'react-native-web';
 import { COLORS } from '../styles/colors';
+import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login({ navigation }) {
@@ -21,9 +21,22 @@ export default function Login({ navigation }) {
       Alert.alert("Error", "Por favor ingrese ambos campos.");
       return;
     }
+  
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert("Error", "Ingrese un correo electrónico válido.");
+      return;
+    }
 
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
+
+      if (rememberMe) {
+        await AsyncStorage.setItem('@rememberEmail', email.trim());
+      }else{
+        await AsyncStorage.removeItem('@rememberedEmail');
+      }
+      
       Alert.alert("Login exitoso", "Has iniciado sesión correctamente.");
       // El observador de Firebase cambia la pantalla al detectar la sesión.
     } catch (error) {
@@ -52,13 +65,21 @@ export default function Login({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+    colors={['#4A4A4A', '#E89B3C', '#D18A2E']}
+    start={{ x: 0, y: 0}}
+    end={{ x: 1, y: 1}}
+    style={styles.container}
+    >
+    <View style={styles.card}>
       <Image source={require('../assets/logo.jpg')} style={styles.logo} />
       <Text style={styles.title}>Iniciar sesión</Text>
 
       <Text style={styles.subtitle}>
-        Accede a tu cuenta de <Text style={styles.brandName}>LOS CARDONES</Text>
+        Accedé a tu cuenta de <Text style={styles.brandName}>LOS CARDONES</Text>
       </Text>
+
+      <View style={styles.colorLine} />
 
       <Text style={styles.label}>Correo</Text>
       <View style={[styles.inputContainer, isEmailFocused && styles.inputFocused]}>
@@ -90,26 +111,27 @@ export default function Login({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.rememberContainer}>
-        <TouchableOpacity
-          style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
-          onPress={() => setRememberMe(!rememberMe)}
-        >
-          {rememberMe && <FontAwesome name="check" size={12} color={COLORS.blanco} />}
-        </TouchableOpacity>
-        <Text style={styles.rememberText}>Recordar contraseña</Text>
+        <View style={styles.rememberContainer}>
+          <TouchableOpacity
+            style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
+            onPress={() => setRememberMe(!rememberMe)}
+          >
+            {rememberMe && <FontAwesome name="check" size={12} color={COLORS.blanco} />}
+          </TouchableOpacity>
+          <Text style={styles.rememberText}>Recordar Contraseña</Text>
       </View>
-
-      <TouchableOpacity onPress={() => navigation.navigate()}>
-          <Text style={styles.linkText}>¿Olvidaste tu contraseña?</Text>
-      </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLoading}>
         {isLoading ? (
-          <ActivityIndicator color={COLORS.blanco}/>)  :
-          (<Text style={styles.buttonText}>Ingresar</Text>)}
+          <ActivityIndicator color={COLORS.blanco} size='small' />
+        ) : (
+          <Text style={styles.buttonText}>Ingresar</Text>
+        )}
       </TouchableOpacity>
 
+        <TouchableOpacity onPress={() => navigation.navigate('Recuperar')}>
+          <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
     
       <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
         <Text style={styles.signUpText}>
@@ -117,6 +139,8 @@ export default function Login({ navigation }) {
         <Text style= {styles.linkText}> Regístrate</Text></Text>
       </TouchableOpacity>
     </View>
+    </LinearGradient>
+    
   );
 }
 

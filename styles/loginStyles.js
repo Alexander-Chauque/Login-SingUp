@@ -8,6 +8,22 @@ export const loginStyles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     backgroundColor: COLORS.blanco,
+    padding: 20,
+  },
+
+  card: {
+    backgroundColor: COLORS.blanco,
+    borderRadius: 25,
+    padding: 24,
+    width: '95%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    borderTopWidth: 4,
+    borderTopColor: COLORS.naranja,
   },
 
   logo: {
@@ -15,8 +31,8 @@ export const loginStyles = StyleSheet.create({
     height: 120,
     marginBottom: 20,
     resizeMode: 'contain',
+    alignSelf: 'center',
     borderRadius: 40,
-    elevation: 5,
   },
 
   title: {
@@ -34,14 +50,21 @@ export const loginStyles = StyleSheet.create({
     fontFamily: FONTS.titulo,
     color: COLORS.grisMedio,
     marginBottom: 30,
-    textAlign: 'center',
+    textAlign:'left',
   },
 
   brandName: {
-  color: COLORS.naranja,
-  fontFamily: FONTS.titulo,
-  fontWeight: 'bold',
-},
+    color: COLORS.naranja,
+    fontFamily: FONTS.titulo,
+    fontWeight: 'bold',
+  },
+
+  colorLine: {
+    height: 4,
+    width: 100,
+    flexDirection: 'row',
+    marginBottom: 30,
+  },
 
   label: {
     alignSelf: 'flex-start',
@@ -85,11 +108,23 @@ export const loginStyles = StyleSheet.create({
     color: COLORS.grisOscuro,
   },
 
+  passwordSection: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+
+  rowOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 30,
+  },
+
   rememberContainer: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: 10,
-  marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   checkbox: {
@@ -110,14 +145,23 @@ export const loginStyles = StyleSheet.create({
 
   rememberText: {
     fontSize: 14,
-    fontFamily: FONTS.cuerpo,
+    fontFamily: FONTS.titulo,
     color: COLORS.grisOscuro,
+    marginRight: 25,
   },
+
+  forgotText: {
+    fontSize: 14,
+    fontFamily: FONTS.titulo,
+    color: COLORS.naranja,
+  },
+
   button: {
     backgroundColor: COLORS.naranja,
     borderRadius: 8,
     height: 50,
-    paddingHorizontal: 50,
+    width: '40%',
+    alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
@@ -131,14 +175,14 @@ export const loginStyles = StyleSheet.create({
     textTransform: 'uppercase',
   },
 
-
   forgotText: {
     color: COLORS.naranja,
-    fontFamily: FONTS.cuerpo,
+    fontFamily: FONTS.titulo,
     fontSize: 14,
-    textAlign: 'right',
-    marginTop: 8,
-    marginBottom: 16,
+    textAlign: 'center',
+    marginTop: 25,
+    textDecorationLine: 'underline',
+    fontWeight: 3,
   },
 
   signUpText: {

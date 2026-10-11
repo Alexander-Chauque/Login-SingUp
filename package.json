@@ -13,6 +13,7 @@
     "ci": "^2.3.0",
     "expo": "~57.0.24",
     "expo-font": "~57.0.4",
+    "expo-linear-gradient": "~57.0.2",
     "expo-status-bar": "~57.0.1",
     "firebase": "^12.19.0",
     "react": "19.2.3",
