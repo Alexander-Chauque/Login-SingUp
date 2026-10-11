@@ -53,7 +53,8 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/logo.jpg')} style={styles.logo} />
+      <View style={styles.card}>
+      <Image source={require('../assets/logo.jpg')} style={styles.logo} resizeMode="contain" />
       <Text style={styles.title}>Iniciar sesión</Text>
 
       <Text style={styles.subtitle}>
@@ -116,6 +117,7 @@ export default function Login({ navigation }) {
           ¿No tienes cuenta aún? 
         <Text style= {styles.linkText}> Regístrate</Text></Text>
       </TouchableOpacity>
+    </View>
     </View>
   );
 }

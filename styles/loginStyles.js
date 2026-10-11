@@ -7,9 +7,18 @@ export const loginStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: COLORS.blanco,
+    backgroundColor: COLORS.naranjaClaro,
   },
-
+  card: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: COLORS.blanco,
+    borderRadius: 24,
+    borderTopWidth: 5,
+    borderTopColor: COLORS.naranja,
+    padding: 20,
+    alignItems: 'center',
+  },
   logo: {
     width: 120,
     height: 120,
