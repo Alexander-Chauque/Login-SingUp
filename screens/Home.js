@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
 import { signOut } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
+import { homeStyles as styles } from '../styles/homeStyles';
+import { COLORS } from '../styles/colors';
 
 export default function Home({ navigation }) {
 
@@ -17,44 +19,19 @@ export default function Home({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
-      <Text style={styles.title}>Bienvenido a la aplicación</Text>
-      <TouchableOpacity style={styles.button} onPress={handleLogOut}>
-        <Text style={styles.buttonText}>Cerrar sesión</Text>
-      </TouchableOpacity>
+      <View style={styles.circleTop} />
+      <View style={styles.circleBottom} />
+
+      <View style={styles.card}>
+        <Image source={require('../assets/logo.jpg')} style={styles.logo} />
+        <Text style={styles.title}>¡Bienvenido!</Text>
+        <Text style={styles.subtitle}>
+          Sistema de gestión de <Text style={styles.brandName}>LOS CARDONES</Text>
+        </Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogOut}>
+          <Text style={styles.logoutText}>Cerrar Sesión</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#922b21',
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
-

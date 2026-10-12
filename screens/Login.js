@@ -15,6 +15,7 @@ export default function Login({ navigation }) {
   const [rememberMe, setRememberMe] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Cargar el correo guardado al abrir la pantalla
   useEffect(() => {
@@ -33,16 +34,17 @@ export default function Login({ navigation }) {
   }, []);
 
   const handleLogin = async () => {
+    setErrorMessage('');
     // Validar campos vacíos
     if (!email.trim() || !password) {
-      Alert.alert("Error", "Por favor ingrese ambos campos.");
+      setErrorMessage("Por favor ingrese ambos campos.");
       return;
     }
 
     // Validar formato de correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
-      Alert.alert("Error", "Ingrese un correo electrónico válido.");
+      setErrorMessage("Ingrese un correo electrónico válido.");
       return;
     }
 
@@ -57,8 +59,6 @@ export default function Login({ navigation }) {
       } else {
         await AsyncStorage.removeItem('@rememberedEmail');
       }
-
-      Alert.alert("Login exitoso", "Has iniciado sesión correctamente.");
       // El observador de Firebase cambia la pantalla al detectar la sesión.
     } catch (error) {
       console.error('Error de inicio de sesión:', error.code, error.message);
@@ -84,7 +84,7 @@ export default function Login({ navigation }) {
           errorMessage = "La clave API de Firebase no es válida. Revisa el archivo .env.";
           break;
       }
-      Alert.alert("Error", `${errorMessage}\n\nCódigo: ${error.code ?? 'desconocido'}`);
+      setErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -171,6 +171,13 @@ export default function Login({ navigation }) {
                 <Text style={styles.buttonText}>Ingresar</Text>
               )}
             </TouchableOpacity>
+
+            {errorMessage ? (
+              <View style={styles.errorContainer}>
+                <FontAwesome name="exclamation-circle" size={16} color={COLORS.rojo} />
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              </View>
+            ) : null}
 
             <TouchableOpacity onPress={() => navigation.navigate('Recuperar')}>
               <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
