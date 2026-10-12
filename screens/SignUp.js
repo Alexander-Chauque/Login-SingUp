@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {View, Text, TextInput, TouchableOpacity, Alert, Image, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform,} from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { auth } from '../src/config/firebaseConfig';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { signUpStyles as styles} from '../styles/signUpStyles';
+import { auth } from '../src/config/firebaseConfig';
+import { signUpStyles as styles } from '../styles/signUpStyles';
 import { COLORS } from '../styles/colors';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -19,6 +19,7 @@ export default function SignUp({ navigation }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [focusedField, setFocusedField] = useState(null);
 
   const handleSignUp = async () => {
   setErrorMessage('');
@@ -92,130 +93,140 @@ export default function SignUp({ navigation }) {
   };
 
   return (
-    <LinearGradient
-      colors={['#4A4A4A', '#E89B3C', '#D18A2E']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
+  <View style={styles.container}>
+  <View style={styles.circleTop} />
+  <View style={styles.circleBottom} />
+
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={styles.card}>
-        <Image source={require('../assets/logo.jpg')} style={styles.logo} />
-        <Text style={styles.title}>Crear cuenta</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.card}>
+          <Image source={require('../assets/logo.jpg')} style={styles.logo} />
+          <Text style={styles.title}>Crear cuenta</Text>
 
-        <Text style={styles.subtitle}>
-          Registrate en <Text style={styles.brandName}>LOS CARDONES</Text>
-        </Text>
-
-        <Text style={styles.label}>Nombre</Text>
-        <View style={styles.inputContainer}>
-          <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese su nombre"
-            value={nombre}
-            onChangeText={setNombre}
-          />
-        </View>
-
-        <Text style={styles.label}>Apellido</Text>
-        <View style={styles.inputContainer}>
-          <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese su apellido"
-            value={apellido}
-            onChangeText={setApellido}
-          />
-        </View>
-
-        <Text style={styles.label}>DNI</Text>
-        <View style={styles.inputContainer}>
-          <FontAwesome name="id-card" size={20} color={COLORS.grisMedio} style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese su DNI"
-            value={dni}
-            onChangeText={setDni}
-            keyboardType="numeric"
-          />
-        </View>
-
-        <Text style={styles.label}>Correo electrónico</Text>
-        <View style={styles.inputContainer}>
-          <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese su correo"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-
-        <Text style={styles.label}>Teléfono</Text>
-        <View style={styles.inputContainer}>
-          <FontAwesome name="phone" size={20} color={COLORS.grisMedio} style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese su teléfono"
-            value={telefono}
-            onChangeText={setTelefono}
-            keyboardType="phone-pad"
-          />
-        </View>
-
-        <Text style={styles.label}>Contraseña</Text>
-        <View style={styles.inputContainer}>
-          <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese su contraseña"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-          />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>Confirmar contraseña</Text>
-        <View style={styles.inputContainer}>
-          <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirme su contraseña"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry={!showConfirmPassword}
-          />
-          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-            <FontAwesome name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
-          </TouchableOpacity>
-        </View>
-
-        {errorMessage ? (
-          <View style={styles.errorContainer}>
-            <FontAwesome name="exclamation-circle" size={16} color={COLORS.rojo} />
-            <Text style={styles.errorText}>{errorMessage}</Text>
-          </View>
-        ) : null}
-
-        <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={isLoading}>
-          {isLoading ? (
-            <ActivityIndicator color={COLORS.blanco} />
-          ) : (
-            <Text style={styles.buttonText}>Registrarse</Text>
-          )}
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.signUpText}>
-            ¿Ya estás registrado? <Text style={styles.linkText}>Inicia Sesión</Text>
+          <Text style={styles.subtitle}>
+            Registrate en <Text style={styles.brandName}>LOS CARDONES</Text>
           </Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
+
+          <View style={styles.colorLine} />
+          
+          <Text style={styles.label}>Nombre</Text>
+          <View style={styles.inputContainer}>
+            <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+                style={styles.input}
+                placeholder="Ingrese su nombre"
+                value={nombre}
+                onChangeText={setNombre}
+            />
+          </View>
+
+          <Text style={styles.label}>Apellido</Text>
+          <View style={styles.inputContainer}>
+            <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ingrese su apellido"
+              value={apellido}
+              onChangeText={setApellido}
+            />
+          </View>
+
+          <Text style={styles.label}>DNI</Text>
+          <View style={styles.inputContainer}>
+            <FontAwesome name="id-card" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ingrese su DNI"
+              value={dni}
+              onChangeText={setDni}
+              keyboardType="numeric"
+            />
+          </View>
+
+          <Text style={styles.label}>Correo electrónico</Text>
+          <View style={styles.inputContainer}>
+            <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ingrese su correo"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <Text style={styles.label}>Teléfono</Text>
+          <View style={styles.inputContainer}>
+            <FontAwesome name="phone" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ingrese su teléfono"
+              value={telefono}
+              onChangeText={setTelefono}
+              keyboardType="phone-pad"
+            />
+          </View>
+
+          <Text style={styles.label}>Contraseña</Text>
+          <View style={styles.inputContainer}>
+            <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ingrese su contraseña"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.label}>Confirmar contraseña</Text>
+          <View style={styles.inputContainer}>
+            <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Confirme su contraseña"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+            />
+            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+              <FontAwesome name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
+            </TouchableOpacity>
+          </View>
+
+          {errorMessage ? (
+            <View style={styles.errorContainer}>
+              <FontAwesome name="exclamation-circle" size={16} color={COLORS.rojo} />
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+          ) : null}
+
+          <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={isLoading}>
+            {isLoading ? (
+              <ActivityIndicator color={COLORS.blanco} />
+            ) : (
+              <Text style={styles.buttonText}>Registrarse</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.signUpText}>
+              ¿Ya estás registrado? <Text style={styles.linkText}>Inicia Sesión</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  </View>
   );
 }
