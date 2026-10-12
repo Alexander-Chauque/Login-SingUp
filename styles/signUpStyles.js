@@ -130,6 +130,25 @@ export const signUpStyles = StyleSheet.create({
         marginRight: 10,
     },
 
+    infoCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#E8E8E8', 
+        borderRadius: 8,
+        padding: 10,
+        marginTop: 5,
+        marginBottom: 15,
+        width: '100%',
+    },
+
+    infoText: {
+        color: '#4A4A4A',                 
+        fontSize: 11,
+        fontFamily: FONTS.cuerpo,
+        marginLeft: 8,
+        flex: 1,
+    },
+
     input: {
         flex: 1,
         height: 40,
@@ -193,4 +212,109 @@ export const signUpStyles = StyleSheet.create({
         marginLeft: 8,
         flex: 1,
     },
+
+    termsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+        marginBottom: 15,
+        width: '100%',
+        paddingLeft: 4,
+    },
+
+    checkbox: {
+        width: 20,
+        height: 20,
+        borderWidth: 2,
+        borderColor: COLORS.naranja,
+        borderRadius: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 8,
+    },
+
+    checkboxChecked: {
+        backgroundColor: COLORS.naranja,
+        borderColor: COLORS.naranja,
+    },
+
+    termsText: {
+        fontSize: 12,
+        fontFamily: FONTS.cuerpo,
+        color: COLORS.grisOscuro,
+        flex: 1,
+    },
+
+    termsLink: {
+        color: COLORS.naranja,
+        fontFamily: FONTS.titulo,
+        fontWeight: 'bold',
+        textDecorationLine: 'underline',
+    },
+
+    strengthContainer: {
+        width: '100%',
+        marginTop: -8,
+        marginBottom: 12,
+    },
+
+    strengthBarContainer: {
+        height: 6,
+        backgroundColor: '#E0E0E0',
+        borderRadius: 3,
+        overflow: 'hidden',
+        marginBottom: 4,
+    },
+
+    strengthBar: {
+        height: '100%',
+        width: '0%',
+        borderRadius: 3,
+    },
+
+    strengthWeak: {
+        width: '33%',
+        backgroundColor: COLORS.rojo,
+    },
+
+    strengthMedium: {
+        width: '66%',
+        backgroundColor: '#F57C00',
+    },
+
+    strengthStrong: {
+        width: '100%',
+        backgroundColor: COLORS.verde,
+    },
+
+    strengthText: {
+        fontSize: 11,
+        fontFamily: FONTS.cuerpo,
+        textAlign: 'right',
+    },
+
+    requirementsContainer: {
+        marginTop: 5,
+        marginBottom: 12,
+    },
+
+    requirementItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 3,
+    },
+
+    requirementIcon: {
+    
+    },
+
+    requirementText: {
+        fontSize: 11,
+        fontFamily: FONTS.cuerpo,
+        color: COLORS.grisOscuro,
+    },
     });
+
+
+
+

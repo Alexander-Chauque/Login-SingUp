@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {View, Text, TextInput, TouchableOpacity, Alert, Image, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform,} from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
 import { signUpStyles as styles } from '../styles/signUpStyles';
 import { COLORS } from '../styles/colors';
-import { LinearGradient } from 'expo-linear-gradient';
 
 export default function SignUp({ navigation }) {
   const [nombre, setNombre] = useState('');
@@ -20,13 +19,48 @@ export default function SignUp({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [focusedField, setFocusedField] = useState(null);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState('');
+  
+
+  const checkPasswordStrength = (password) => {
+    let strength = 0;
+
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[!@#$%^&*]/.test(password)) strength++;
+
+    if (password.length === 0) {
+      setPasswordStrength('');
+    } else if (strength <= 2) {
+      setPasswordStrength('weak');
+    } else if (strength <= 4) {
+      setPasswordStrength('medium');
+    } else {
+      setPasswordStrength('strong');
+    }
+  };
 
   const handleSignUp = async () => {
   setErrorMessage('');
 
   // Validar que todos los campos estén completos
-  if (!nombre.trim() || !apellido.trim() || !dni.trim() || !email.trim() || !telefono.trim() || !password || !confirmPassword) {
+  if (!nombre.trim() || !apellido.trim() || !dni.trim() || !email.trim() || !password || !confirmPassword) {
     setErrorMessage("Todos los campos son obligatorios.");
+    return;
+  }
+
+  // Validar nombre y apellido
+  if (nombreLimpio.length < 2 || apellidoLimpio.length < 2) {
+    setErrorMessage('El nombre y el apellido deben tener al menos 2 caracteres.');
+    return;
+  }
+
+  // DNI argentino: 7 u 8 dígitos
+  if (!/^\d{7,8}$/.test(dniLimpio)) {
+    setErrorMessage('Ingresá un DNI de 7 u 8 números.');
     return;
   }
 
@@ -50,7 +84,19 @@ export default function SignUp({ navigation }) {
     return;
   }
 
-  setIsLoading(true);
+  // Teléfono opcional: validar solo si se completó
+  if (telefono.trim() && !/^[+\d\s()-]{8,20}$/.test(telefono.trim())) {
+    setErrorMessage('Revisá el formato del teléfono.');
+    return;
+  }
+
+  //Validar que aceptó los términos
+  if (!acceptTerms) {
+    setErrorMessage("Debes aceptar los términos y condiciones para registrarte.");
+    return;
+  }
+
+    setIsLoading(true);
 
   try {
     // Crear usuario en Firebase
@@ -61,7 +107,14 @@ export default function SignUp({ navigation }) {
       displayName: `${nombre.trim()} ${apellido.trim()}`,
     });
 
-    Alert.alert("Registro exitoso", "Usuario registrado con éxito.");
+    //Enviar correo de verificación
+    await sendEmailVerification(credential.user);
+
+    Alert.alert("Registro exitoso", "Usuario registrado con éxito.",
+      [{ text: 'Entendido', onPress:() => navigation.navigate ('Login')},]
+    );
+    
+
     // El observador de Firebase redirige al Home
   } catch (error) {
     let errorMessage = "Hubo un problema al registrar el usuario.";
@@ -78,17 +131,26 @@ export default function SignUp({ navigation }) {
       case 'auth/network-request-failed':
         errorMessage = "Error de conexión, por favor intenta más tarde.";
         break;
+      case 'auth/too-many-requests':
+        errorMensaje = 'Demasiados intentos. Esperá un momento.';
+        break;
       }
-      Alert.alert("Error", `${errorMessage}\n\nCódigo: ${error.code ?? 'desconocido'}`);
-      return;
-    }
+      setErrorMessage(mensaje);
+  } finally {
+    setIsLoading(false);
+  };
+    //   Alert.alert("Error", `${errorMessage}\n\nCódigo: ${error.code ?? 'desconocido'}`);
+    //   return;
+    
+    // }
 
-    try {
-      await updateProfile(credential.user, { displayName: `${firstName.trim()} ${lastName.trim()}` });
-      Alert.alert("Registro exitoso", "Usuario registrado con éxito.");
-    } catch (error) {
-      Alert.alert("Cuenta creada", "La cuenta se creó, pero no se pudo guardar el nombre.");
-    }
+
+    // try {
+    //   await updateProfile(credential.user, { displayName: `${firstName.trim()} ${lastName.trim()}` });
+    //   Alert.alert("Registro exitoso", "Usuario registrado con éxito.");
+    // } catch (error) {
+    //   Alert.alert("Cuenta creada", "La cuenta se creó, pero no se pudo guardar el nombre.");
+    // }
     // Firebase inicia la sesión y el navegador muestra Home.
   };
 
@@ -98,9 +160,9 @@ export default function SignUp({ navigation }) {
   <View style={styles.circleBottom} />
 
     <KeyboardAvoidingView
-      style={{ flex: 1, width: '100%' }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0:0}
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'undefined'}
+      keyboardVerticalOffset={Platform.OS === 'ios' }
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -114,9 +176,16 @@ export default function SignUp({ navigation }) {
             Registrate en <Text style={styles.brandName}>LOS CARDONES</Text>
           </Text>
 
+          <View style={styles.infoCard}>
+            <FontAwesome name='info-circle' size={16} color={COLORS.grisOscuro}/>
+            <Text style ={styles.infoText}>
+              Todos los campos son obligatorios excepto el teléfono
+            </Text>
+          </View>
+
           <View style={styles.colorLine} />
 
-          <Text style={styles.label}>Nombre</Text>
+                    <Text style={styles.label}>Nombre</Text>
           <View style={[styles.inputContainer, focusedField === 'nombre' && styles.inputFocused]}>
             <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
             <TextInput
@@ -192,15 +261,91 @@ export default function SignUp({ navigation }) {
               style={styles.input}
               placeholder="Ingrese su contraseña"
               value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              onFocus={() => setFocusedField('password')}
+              onChangeText= {setPassword}
               onBlur={() => setFocusedField(null)}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
             </TouchableOpacity>
           </View>
+
+          {password.length > 0 && (
+            // <View style={styles.strengthContainer}>
+
+            //   <View style={styles.strengthBarContainer}>
+            //     <View
+            //       style={[
+            //         styles.strengthBar,
+            //         passwordStrength === 'weak' && styles.strengthWeak,
+            //         passwordStrength === 'medium' && styles.strengthMedium,
+            //         passwordStrength === 'strong' && styles.strengthStrong,
+            //       ]}
+            //     />
+            //   </View>
+
+            //   <Text style={[
+            //     styles.strengthText,
+            //     passwordStrength === 'weak' && { color: COLORS.rojo },
+            //     passwordStrength === 'medium' && { color: '#F57C00' },
+            //     passwordStrength === 'strong' && { color: COLORS.verde },
+            //   ]}>
+            //     {passwordStrength === 'weak' && 'Contraseña débil'}
+            //     {passwordStrength === 'medium' && 'Contraseña media'}
+            //     {passwordStrength === 'strong' && 'Contraseña fuerte'}
+            //   </Text>
+
+              <View style={styles.requirementsContainer}>
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={password.length >= 8 ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={password.length >= 8 ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Mínimo 8 caracteres</Text>
+                </View>
+
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={/[A-Z]/.test(password) ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={/[A-Z]/.test(password) ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Una letra mayúscula</Text>
+                </View>
+
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={/[a-z]/.test(password) ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={/[a-z]/.test(password) ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Una letra minúscula</Text>
+                </View>
+
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={/\d/.test(password) ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={/\d/.test(password) ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Un número</Text>
+                </View>
+
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={/[!@#$%^&*]/.test(password) ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={/[!@#$%^&*]/.test(password) ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Un carácter especial (!@#$%^&)</Text>
+                </View>
+              </View>
+          )}
 
           <Text style={styles.label}>Confirmar contraseña</Text>
           <View style={[styles.inputContainer, focusedField === 'confirmPassword' && styles.inputFocused]}>
@@ -225,6 +370,19 @@ export default function SignUp({ navigation }) {
               <Text style={styles.errorText}>{errorMessage}</Text>
             </View>
           ) : null}
+
+          <View style={styles.termsContainer}>
+            <TouchableOpacity
+              style={[styles.checkbox, acceptTerms && styles.checkboxChecked]}
+              onPress={() => setAcceptTerms(!acceptTerms)}>{acceptTerms && (
+                <FontAwesome name="check" size={12} color={COLORS.blanco} />)}
+            </TouchableOpacity>
+            <Text style={styles.termsText}> Acepto los{' '}
+              <Text style={styles.termsLink} onPress={() => navigation.navigate('Terminos')}>
+                términos y condiciones
+              </Text>
+            </Text>
+          </View>
 
           <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={isLoading}>
             {isLoading ? (
