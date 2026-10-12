@@ -53,13 +53,13 @@ export default function SignUp({ navigation }) {
   }
 
   // Validar nombre y apellido
-  if (nombreLimpio.length < 2 || apellidoLimpio.length < 2) {
+  if (nombre.length < 2 || apellido.length < 2) {
     setErrorMessage('El nombre y el apellido deben tener al menos 2 caracteres.');
     return;
   }
 
   // DNI argentino: 7 u 8 dígitos
-  if (!/^\d{7,8}$/.test(dniLimpio)) {
+  if (!/^\d{7,8}$/.test(dni)) {
     setErrorMessage('Ingresá un DNI de 7 u 8 números.');
     return;
   }
@@ -72,7 +72,7 @@ export default function SignUp({ navigation }) {
   }
 
   // Validar contraseña segura
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*_\-]).{8,}$/;
   if (!passwordRegex.test(password)) {
     setErrorMessage("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.");
     return;
@@ -86,7 +86,7 @@ export default function SignUp({ navigation }) {
 
   // Teléfono opcional: validar solo si se completó
   if (telefono.trim() && !/^[+\d\s()-]{8,20}$/.test(telefono.trim())) {
-    setErrorMessage('Revisá el formato del teléfono.');
+    setErrorMessage('Revisá el formato del teléfono. Debe tener entre 8 y 20 caracteres');
     return;
   }
 
@@ -109,9 +109,7 @@ export default function SignUp({ navigation }) {
 
     //Enviar correo de verificación
     await sendEmailVerification(credential.user);
-
     Alert.alert("Registro exitoso", "Usuario registrado con éxito.",
-      [{ text: 'Entendido', onPress:() => navigation.navigate ('Login')},]
     );
     
 
@@ -262,6 +260,8 @@ export default function SignUp({ navigation }) {
               placeholder="Ingrese su contraseña"
               value={password}
               onChangeText= {setPassword}
+              secureTextEntry={!showPassword}
+              onFocus={() => setFocusedField('password')}
               onBlur={() => setFocusedField(null)}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -270,30 +270,6 @@ export default function SignUp({ navigation }) {
           </View>
 
           {password.length > 0 && (
-            // <View style={styles.strengthContainer}>
-
-            //   <View style={styles.strengthBarContainer}>
-            //     <View
-            //       style={[
-            //         styles.strengthBar,
-            //         passwordStrength === 'weak' && styles.strengthWeak,
-            //         passwordStrength === 'medium' && styles.strengthMedium,
-            //         passwordStrength === 'strong' && styles.strengthStrong,
-            //       ]}
-            //     />
-            //   </View>
-
-            //   <Text style={[
-            //     styles.strengthText,
-            //     passwordStrength === 'weak' && { color: COLORS.rojo },
-            //     passwordStrength === 'medium' && { color: '#F57C00' },
-            //     passwordStrength === 'strong' && { color: COLORS.verde },
-            //   ]}>
-            //     {passwordStrength === 'weak' && 'Contraseña débil'}
-            //     {passwordStrength === 'medium' && 'Contraseña media'}
-            //     {passwordStrength === 'strong' && 'Contraseña fuerte'}
-            //   </Text>
-
               <View style={styles.requirementsContainer}>
                 <View style={styles.requirementItem}>
                   <FontAwesome
@@ -337,12 +313,12 @@ export default function SignUp({ navigation }) {
 
                 <View style={styles.requirementItem}>
                   <FontAwesome
-                    name={/[!@#$%^&*]/.test(password) ? 'check-circle' : 'times-circle'}
+                    name={/[!@#$%^&*_\-}]/.test(password) ? 'check-circle' : 'times-circle'}
                     size={12}
-                    color={/[!@#$%^&*]/.test(password) ? COLORS.verde : COLORS.rojo}
+                    color={/[!@#$%^&*_\-]/.test(password) ? COLORS.verde : COLORS.rojo}
                     style={styles.requirementIcon}
                   />
-                  <Text style={styles.requirementText}>Un carácter especial (!@#$%^&)</Text>
+                  <Text style={styles.requirementText}>Un carácter especial (! @ # $ % ^ & _ -)</Text>
                 </View>
               </View>
           )}

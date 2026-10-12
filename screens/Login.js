@@ -112,7 +112,6 @@ export default function Login({ navigation }) {
 
             <View style={styles.colorLine} />
 
-            {/* Campo de correo */}
             <Text style={styles.label}>Correo</Text>
             <View style={[styles.inputContainer, isEmailFocused && styles.inputFocused]}>
               <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
@@ -130,7 +129,6 @@ export default function Login({ navigation }) {
               />
             </View>
 
-            {/* Campo de contraseña */}
             <Text style={styles.label}>Contraseña</Text>
             <View style={[styles.inputContainer, isPasswordFocused && styles.inputFocused]}>
               <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
@@ -152,7 +150,6 @@ export default function Login({ navigation }) {
               </TouchableOpacity>
             </View>
 
-            {/* Checkbox Recordar contraseña */}
             <View style={styles.rememberContainer}>
               <TouchableOpacity
                 style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
@@ -163,7 +160,6 @@ export default function Login({ navigation }) {
               <Text style={styles.rememberText}>Recordar Contraseña</Text>
             </View>
 
-            {/* Botón Ingresar */}
             <TouchableOpacity
               style={styles.button}
               onPress={handleLogin}
@@ -176,12 +172,10 @@ export default function Login({ navigation }) {
               )}
             </TouchableOpacity>
 
-            {/* Enlace ¿Olvidaste tu contraseña? */}
             <TouchableOpacity onPress={() => navigation.navigate('Recuperar')}>
               <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
             </TouchableOpacity>
 
-            {/* Enlace Regístrate */}
             <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
               <Text style={styles.signUpText}>
                 ¿No tienes cuenta aún? <Text style={styles.linkText}>Regístrate</Text>
