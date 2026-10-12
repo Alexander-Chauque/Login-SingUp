@@ -98,8 +98,9 @@ export default function SignUp({ navigation }) {
   <View style={styles.circleBottom} />
 
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, width: '100%' }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0:0}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -114,31 +115,35 @@ export default function SignUp({ navigation }) {
           </Text>
 
           <View style={styles.colorLine} />
-          
+
           <Text style={styles.label}>Nombre</Text>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, focusedField === 'nombre' && styles.inputFocused]}>
             <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
             <TextInput
                 style={styles.input}
                 placeholder="Ingrese su nombre"
                 value={nombre}
                 onChangeText={setNombre}
+                onFocus={() => setFocusedField('nombre')}
+                onBlur={() => setFocusedField(null)}
             />
           </View>
 
           <Text style={styles.label}>Apellido</Text>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, focusedField === 'apellido' && styles.inputFocused]}>
             <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
             <TextInput
               style={styles.input}
               placeholder="Ingrese su apellido"
               value={apellido}
               onChangeText={setApellido}
+              onFocus={() => setFocusedField('apellido')}
+              onBlur={() => setFocusedField(null)}
             />
           </View>
 
           <Text style={styles.label}>DNI</Text>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, focusedField === 'dni' && styles.inputFocused]}>
             <FontAwesome name="id-card" size={20} color={COLORS.grisMedio} style={styles.icon} />
             <TextInput
               style={styles.input}
@@ -146,11 +151,13 @@ export default function SignUp({ navigation }) {
               value={dni}
               onChangeText={setDni}
               keyboardType="numeric"
+              onFocus={() => setFocusedField('dni')}
+              onBlur={() => setFocusedField(null)}
             />
           </View>
 
           <Text style={styles.label}>Correo electrónico</Text>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, focusedField === 'email' && styles.inputFocused]}>
             <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
             <TextInput
               style={styles.input}
@@ -159,11 +166,13 @@ export default function SignUp({ navigation }) {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              onFocus={() => setFocusedField('email')}
+              onBlur={() => setFocusedField(null)}
             />
           </View>
 
           <Text style={styles.label}>Teléfono</Text>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, focusedField === 'telefono' && styles.inputFocused]}>
             <FontAwesome name="phone" size={20} color={COLORS.grisMedio} style={styles.icon} />
             <TextInput
               style={styles.input}
@@ -171,11 +180,13 @@ export default function SignUp({ navigation }) {
               value={telefono}
               onChangeText={setTelefono}
               keyboardType="phone-pad"
+              onFocus={() => setFocusedField('telefono')}
+              onBlur={() => setFocusedField(null)}
             />
           </View>
 
           <Text style={styles.label}>Contraseña</Text>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, focusedField === 'password' && styles.inputFocused]}>
             <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
             <TextInput
               style={styles.input}
@@ -183,6 +194,8 @@ export default function SignUp({ navigation }) {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
+              onFocus={() => setFocusedField('password')}
+              onBlur={() => setFocusedField(null)}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
@@ -190,7 +203,7 @@ export default function SignUp({ navigation }) {
           </View>
 
           <Text style={styles.label}>Confirmar contraseña</Text>
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, focusedField === 'confirmPassword' && styles.inputFocused]}>
             <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
             <TextInput
               style={styles.input}
@@ -198,6 +211,8 @@ export default function SignUp({ navigation }) {
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={!showConfirmPassword}
+              onFocus={() => setFocusedField('confirmPassword')}
+              onBlur={() => setFocusedField(null)}
             />
             <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
               <FontAwesome name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />

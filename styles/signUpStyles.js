@@ -37,6 +37,7 @@ export const signUpStyles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 20,
         paddingHorizontal: 20,
+        paddingBottom: 100,
     },
 
     card: {
@@ -185,7 +186,6 @@ export const signUpStyles = StyleSheet.create({
         width: '100%',
     },
 
-    // Texto del mensaje de error
     errorText: {
         color: COLORS.rojo,
         fontSize: 11,
