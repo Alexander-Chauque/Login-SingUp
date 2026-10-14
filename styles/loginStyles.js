@@ -33,6 +33,22 @@ export const loginStyles = StyleSheet.create({
     borderTopColor: COLORS.naranja,
   },
 
+  formCard: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E6E6E6',
+    paddingHorizontal: 22,
+    paddingTop: 24,
+    paddingBottom: 24,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.18,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+
   circleTop: {
     position: 'absolute',
     width: 200,

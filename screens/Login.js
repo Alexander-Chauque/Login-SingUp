@@ -112,83 +112,85 @@ export default function Login({ navigation }) {
 
             <View style={styles.colorLine} />
 
-            <Text style={styles.label}>Correo</Text>
-            <View style={[styles.inputContainer, isEmailFocused && styles.inputFocused]}>
-              <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su correo"
-                placeholderTextColor={COLORS.grisMedio}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                onFocus={() => setIsEmailFocused(true)}
-                onBlur={() => setIsEmailFocused(false)}
-              />
-            </View>
-
-            <Text style={styles.label}>Contraseña</Text>
-            <View style={[styles.inputContainer, isPasswordFocused && styles.inputFocused]}>
-              <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su contraseña"
-                placeholderTextColor={COLORS.grisMedio}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                onFocus={() => setIsPasswordFocused(true)}
-                onBlur={() => setIsPasswordFocused(false)}
-                returnKeyType="done"
-                onSubmitEditing={handleLogin}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.rememberContainer}>
-              <TouchableOpacity
-                style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
-                onPress={() => setRememberMe(!rememberMe)}
-              >
-                {rememberMe && <FontAwesome name="check" size={12} color={COLORS.blanco} />}
-              </TouchableOpacity>
-              <Text style={styles.rememberText}>Recordar Contraseña</Text>
-            </View>
-
-            <TouchableOpacity
-              style={styles.button}
-              onPress={handleLogin}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator color={COLORS.blanco} size="small" />
-              ) : (
-                <Text style={styles.buttonText}>Ingresar</Text>
-              )}
-            </TouchableOpacity>
-
-            {errorMessage ? (
-              <View style={styles.errorContainer}>
-                <FontAwesome name="exclamation-circle" size={16} color={COLORS.rojo} />
-                <Text style={styles.errorText}>{errorMessage}</Text>
+            <View style={styles.formCard}>
+              <Text style={styles.label}>Correo</Text>
+              <View style={[styles.inputContainer, isEmailFocused && styles.inputFocused]}>
+                <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingrese su correo"
+                  placeholderTextColor={COLORS.grisMedio}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  onFocus={() => setIsEmailFocused(true)}
+                  onBlur={() => setIsEmailFocused(false)}
+                />
               </View>
-            ) : null}
 
-            <TouchableOpacity onPress={() => navigation.navigate('Recuperar')}>
-              <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
-            </TouchableOpacity>
+              <Text style={styles.label}>Contraseña</Text>
+              <View style={[styles.inputContainer, isPasswordFocused && styles.inputFocused]}>
+                <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ingrese su contraseña"
+                  placeholderTextColor={COLORS.grisMedio}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
+                  returnKeyType="done"
+                  onSubmitEditing={handleLogin}
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
+                </TouchableOpacity>
+              </View>
 
-            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-              <Text style={styles.signUpText}>
-                ¿No tienes cuenta aún? <Text style={styles.linkText}>Regístrate</Text>
-              </Text>
-            </TouchableOpacity>
-          </View>
+              <View style={styles.rememberContainer}>
+                <TouchableOpacity
+                  style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
+                  onPress={() => setRememberMe(!rememberMe)}
+                >
+                  {rememberMe && <FontAwesome name="check" size={12} color={COLORS.blanco} />}
+                </TouchableOpacity>
+                <Text style={styles.rememberText}>Recordar Contraseña</Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color={COLORS.blanco} size="small" />
+                ) : (
+                  <Text style={styles.buttonText}>Ingresar</Text>
+                )}
+              </TouchableOpacity>
+
+              {errorMessage ? (
+                <View style={styles.errorContainer}>
+                  <FontAwesome name="exclamation-circle" size={16} color={COLORS.rojo} />
+                  <Text style={styles.errorText}>{errorMessage}</Text>
+                </View>
+              ) : null}
+
+              <TouchableOpacity onPress={() => navigation.navigate('Recuperar')}>
+                <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+                <Text style={styles.signUpText}>
+                  ¿No tienes cuenta aún? <Text style={styles.linkText}>Regístrate</Text>
+                </Text>
+              </TouchableOpacity>
+              </View>
+            </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
