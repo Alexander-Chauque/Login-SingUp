@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform,} from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { auth } from '../src/config/firebaseConfig';
 import { loginStyles as styles } from '../styles/loginStyles';
 import { COLORS } from '../styles/colors';
@@ -35,6 +35,7 @@ export default function Login({ navigation }) {
 
   const handleLogin = async () => {
     setErrorMessage('');
+
     // Validar campos vacíos
     if (!email.trim() || !password) {
       setErrorMessage("Por favor ingrese ambos campos.");
@@ -51,6 +52,13 @@ export default function Login({ navigation }) {
     setIsLoading(true);
 
     try {
+      
+      const methods = await fetchSignInMethodsForEmail(auth, email.trim());
+      if(methods.length === 0){
+        setErrorMessage("No se encontró un usuario con este correo")
+        return;
+      }
+
       await signInWithEmailAndPassword(auth, email.trim(), password);
 
       // Guardar o borrar el correo según el checkbox
@@ -59,6 +67,8 @@ export default function Login({ navigation }) {
       } else {
         await AsyncStorage.removeItem('@rememberedEmail');
       }
+
+      
       // El observador de Firebase cambia la pantalla al detectar la sesión.
     } catch (error) {
       console.error('Error de inicio de sesión:', error.code, error.message);
@@ -69,7 +79,7 @@ export default function Login({ navigation }) {
           break;
         case 'auth/invalid-credential':
         case 'auth/wrong-password':
-          errorMessage = "La contraseña es incorrecta.";
+          errorMessage = "El correo o la contraseña son incorrectos.";
           break;
         case 'auth/user-not-found':
           errorMessage = "No se encontró un usuario con este correo.";

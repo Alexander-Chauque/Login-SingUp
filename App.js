@@ -8,9 +8,12 @@ import Navigation from './navigation/Navigation';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    Oswald: Oswald_400Regular,
-    'Oswald-Bold': Oswald_700Bold,
-    Roboto: Roboto_400Regular,
+    Oswald: Oswald_400Regular,           
+    'Oswald-Bold': Oswald_700Bold,      
+    Roboto: Roboto_400Regular,          
+    Oswald_400Regular,                    
+    Oswald_700Bold,                       
+    Roboto_400Regular,                    
   });
 
   if (!fontsLoaded) {

@@ -22,7 +22,7 @@ export const loginStyles = StyleSheet.create({
     borderRadius: 24,
     padding: 16,
     width: 300,
-    height: 720,
+    height: 770,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -79,7 +79,7 @@ export const loginStyles = StyleSheet.create({
 
   title: {
     fontSize: 26,
-    fontFamily: FONTS.titulo,
+    fontFamily: 'Oswald-bold',
     color: COLORS.grisOscuro,
     marginBottom: 8,
     textAlign: 'center',
@@ -89,7 +89,7 @@ export const loginStyles = StyleSheet.create({
 
   subtitle: {
     fontSize: 13,
-    fontFamily: FONTS.titulo,
+    fontFamily: 'Oswald-bold',
     color: COLORS.grisOscuro,
     marginBottom: 20,
     textAlign: 'center',
@@ -114,7 +114,7 @@ export const loginStyles = StyleSheet.create({
   label: {
     alignSelf: 'flex-start',
     fontSize: 14,
-    fontFamily: FONTS.titulo,
+    fontFamily: 'Oswald-bold',
     fontWeight: 'bold',
     color: COLORS.grisOscuro,
     marginTop: 10,
@@ -200,7 +200,7 @@ export const loginStyles = StyleSheet.create({
   buttonText: {
     color: COLORS.blanco,
     fontSize: 16,
-    fontFamily: FONTS.titulo,
+    fontFamily: 'Oswald-bold',
     fontWeight: 'bold',
     textTransform: 'uppercase',
   },
@@ -225,7 +225,7 @@ export const loginStyles = StyleSheet.create({
 
   linkText: {
     color: COLORS.naranja,
-    fontFamily: FONTS.titulo,
+    fontFamily: 'Oswald-bold',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
   },

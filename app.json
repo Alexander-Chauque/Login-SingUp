@@ -1,20 +1,20 @@
 {
   "expo": {
-    "name": "login-signup",
-    "slug": "login-signup",
+    "name": "Los Cardones Salta",
+    "slug": "los-cardones-salta",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/favicon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.loscardones.salta"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#626262",
+        "foregroundImage": "./assets/favicon.png",
+        "monochromeImage": "./assets/favicon.png"
       }
     },
     "web": {
