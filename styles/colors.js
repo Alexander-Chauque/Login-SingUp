@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 
 export const COLORS = {
-  naranja: '#E89B3C',
+  naranja: '#F7A12E',
   naranjaOscuro: '#D18A2E',
   grisOscuro: '#4A4A4A',
   grisMedio: '#9B9B9B',
@@ -17,10 +17,5 @@ export const FONTS = {
     ios: 'Oswald',
     android: 'Oswald_700Bold',
     default: 'Oswald',
-  }),
-  cuerpo: Platform.select({
-    ios: 'Roboto',
-    android: 'Roboto_400Regular',
-    default: 'Roboto',
   }),
 };

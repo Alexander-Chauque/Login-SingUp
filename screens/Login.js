@@ -1,206 +1,346 @@
-import React, { useState, useEffect } from 'react';
-import {View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform,} from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
-import { signInWithEmailAndPassword, fetchSignInMethodsForEmail } from 'firebase/auth';
-import { auth } from '../src/config/firebaseConfig';
-import { loginStyles as styles } from '../styles/loginStyles';
-import { COLORS } from '../styles/colors';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import Svg, { Path } from "react-native-svg";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+import { auth } from "../src/config/firebaseConfig";
+import { loginStyles as styles } from "../styles/loginStyles";
+import { COLORS } from "../styles/colors";
 
 export default function Login({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Cargar el correo guardado al abrir la pantalla
   useEffect(() => {
     const loadRememberedEmail = async () => {
       try {
-        const savedEmail = await AsyncStorage.getItem('@rememberedEmail');
+        const savedEmail = await AsyncStorage.getItem("@rememberedEmail");
+
         if (savedEmail) {
           setEmail(savedEmail);
           setRememberMe(true);
         }
       } catch (error) {
-        console.log('Error al cargar el correo guardado:', error);
+        console.log("Error al cargar el correo:", error);
       }
     };
+
     loadRememberedEmail();
   }, []);
 
   const handleLogin = async () => {
-    setErrorMessage('');
+    setErrorMessage("");
 
-    // Validar campos vacíos
-    if (!email.trim() || !password) {
-      setErrorMessage("Por favor ingrese ambos campos.");
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail || !password) {
+      setErrorMessage("Por favor, completá ambos campos.");
       return;
     }
 
-    // Validar formato de correo
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      setErrorMessage("Ingrese un correo electrónico válido.");
+
+    if (!emailRegex.test(cleanEmail)) {
+      setErrorMessage("Ingresá un correo electrónico válido.");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      
-      const methods = await fetchSignInMethodsForEmail(auth, email.trim());
-      if(methods.length === 0){
-        setErrorMessage("No se encontró un usuario con este correo")
-        return;
-      }
+      await signInWithEmailAndPassword(auth, cleanEmail, password);
 
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-
-      // Guardar o borrar el correo según el checkbox
       if (rememberMe) {
-        await AsyncStorage.setItem('@rememberedEmail', email.trim());
+        await AsyncStorage.setItem("@rememberedEmail", cleanEmail);
       } else {
-        await AsyncStorage.removeItem('@rememberedEmail');
+        await AsyncStorage.removeItem("@rememberedEmail");
       }
-
-      
-      // El observador de Firebase cambia la pantalla al detectar la sesión.
     } catch (error) {
-      console.error('Error de inicio de sesión:', error.code, error.message);
-      let errorMessage = "Hubo un problema al iniciar sesión.";
+      console.error("Error de inicio de sesión:", error.code);
+
       switch (error.code) {
-        case 'auth/invalid-email':
-          errorMessage = "El formato del correo electrónico no es válido.";
+        case "auth/invalid-email":
+          setErrorMessage("El correo electrónico no es válido.");
           break;
-        case 'auth/invalid-credential':
-        case 'auth/wrong-password':
-          errorMessage = "El correo o la contraseña son incorrectos.";
+
+        case "auth/invalid-credential":
+        case "auth/wrong-password":
+          setErrorMessage("El correo o la contraseña son incorrectos.");
           break;
-        case 'auth/user-not-found':
-          errorMessage = "No se encontró un usuario con este correo.";
+
+        case "auth/user-not-found":
+          setErrorMessage("No se encontró una cuenta con ese correo.");
           break;
-        case 'auth/too-many-requests':
-          errorMessage = "Demasiados intentos fallidos. Espere unos minutos e intente nuevamente.";
+
+        case "auth/too-many-requests":
+          setErrorMessage(
+            "Demasiados intentos. Esperá unos minutos e intentá nuevamente.",
+          );
           break;
-        case 'auth/network-request-failed':
-          errorMessage = "Error de conexión, por favor intenta más tarde.";
+
+        case "auth/network-request-failed":
+          setErrorMessage("Error de conexión. Intentá nuevamente.");
           break;
-        case 'auth/invalid-api-key':
-          errorMessage = "La clave API de Firebase no es válida. Revisa el archivo .env.";
+
+        case "auth/invalid-api-key":
+          setErrorMessage("Error de configuración de Firebase.");
           break;
+
+        default:
+          setErrorMessage("No se pudo iniciar sesión. Intentá nuevamente.");
       }
-      setErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.circleTop}/>
-      <View style={styles.circleBottom}/>
+    <View style={styles.screen}>
+      {/* PAISAJE SUPERIOR */}
+      <View pointerEvents="none" style={styles.topWaveContainer}>
+        <Image
+          source={require("../assets/paisaje.jpg")}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        />
+
+        {/* La curva blanca cubre la parte inferior del paisaje */}
+        <Svg
+          width="100%"
+          height="100%"
+          viewBox="0 0 400 280"
+          preserveAspectRatio="none"
+          style={styles.topWaveSvg}
+        >
+          <Path
+            d="M0 198 C65 174 110 143 180 157 C255 171 300 220 400 235 L400 280 L0 280 Z"
+            fill="#FFFFFF"
+          />
+
+          {/* Borde naranja de la onda */}
+          <Path
+            d="M0 198 C65 174 110 143 180 157 C255 171 300 220 400 235"
+            fill="none"
+            stroke={COLORS.naranja}
+            strokeWidth="3"
+          />
+        </Svg>
+      </View>
+
+      {/* DECORACIÓN INFERIOR */}
+      <View pointerEvents="none" style={styles.bottomWaveContainer}>
+        <Image
+          source={require("../assets/empanadas.png")}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+        />
+
+        <Svg
+          width="100%"
+          height="100%"
+          viewBox="0 0 400 200"
+          preserveAspectRatio="none"
+          style={styles.bottomWaveSvg}
+        >
+          {/* Franja naranja */}
+          <Path
+            d="M0 35 C75 15 115 67 190 65 C270 62 320 8 400 15 L400 45 C320 38 270 88 190 88 C115 90 75 40 0 60 Z"
+            fill={COLORS.naranja}
+          />
+
+          {/* Área blanca que se une al formulario */}
+          <Path
+            d="M0 0 L400 0 L400 15 C320 8 270 62 190 65 C115 67 75 15 0 35 Z"
+            fill="#FFFFFF"
+          />
+        </Svg>
+      </View>
+
+      {/* FORMULARIO */}
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardContainer}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
           <View style={styles.card}>
-            <Image source={require('../assets/logo.jpg')} style={styles.logo} />
+            <Image
+              source={require("../assets/logo.jpg")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+
             <Text style={styles.title}>Iniciar sesión</Text>
 
             <Text style={styles.subtitle}>
-              Accedé a tu cuenta de <Text style={styles.brandName}>LOS CARDONES</Text>
+              Accedé a tu cuenta para continuar
             </Text>
 
-            <View style={styles.colorLine} />
+            <View style={styles.decorativeLines}>
+              <View style={styles.shortLine} />
+              <View style={styles.mainLine} />
+              <View style={styles.shortLine} />
+            </View>
 
-            <View style={styles.formCard}>
-              <Text style={styles.label}>Correo</Text>
-              <View style={[styles.inputContainer, isEmailFocused && styles.inputFocused]}>
-                <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ingrese su correo"
-                  placeholderTextColor={COLORS.grisMedio}
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  onFocus={() => setIsEmailFocused(true)}
-                  onBlur={() => setIsEmailFocused(false)}
-                />
-              </View>
+            {/* CORREO */}
+            <Text style={styles.label}>Correo electrónico</Text>
 
-              <Text style={styles.label}>Contraseña</Text>
-              <View style={[styles.inputContainer, isPasswordFocused && styles.inputFocused]}>
-                <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ingrese su contraseña"
-                  placeholderTextColor={COLORS.grisMedio}
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                  autoCapitalize="none"
-                  onFocus={() => setIsPasswordFocused(true)}
-                  onBlur={() => setIsPasswordFocused(false)}
-                  returnKeyType="done"
-                  onSubmitEditing={handleLogin}
-                />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                  <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
-                </TouchableOpacity>
-              </View>
+            <View style={styles.inputContainer}>
+              <FontAwesome
+                name="envelope-o"
+                size={21}
+                color={COLORS.grisMedio}
+                style={styles.icon}
+              />
 
-              <View style={styles.rememberContainer}>
-                <TouchableOpacity
-                  style={[styles.checkbox, rememberMe && styles.checkboxChecked]}
-                  onPress={() => setRememberMe(!rememberMe)}
-                >
-                  {rememberMe && <FontAwesome name="check" size={12} color={COLORS.blanco} />}
-                </TouchableOpacity>
-                <Text style={styles.rememberText}>Recordar Contraseña</Text>
-              </View>
+              <TextInput
+                style={styles.input}
+                placeholder="ejemplo@correo.com"
+                placeholderTextColor={COLORS.grisMedio}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                textContentType="emailAddress"
+                editable={!isLoading}
+                returnKeyType="next"
+              />
+            </View>
+
+            {/* CONTRASEÑA */}
+            <Text style={styles.label}>Contraseña</Text>
+
+            <View style={styles.inputContainer}>
+              <FontAwesome
+                name="lock"
+                size={24}
+                color={COLORS.grisMedio}
+                style={styles.icon}
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Ingresá tu contraseña"
+                placeholderTextColor={COLORS.grisMedio}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                autoComplete="current-password"
+                textContentType="password"
+                editable={!isLoading}
+                returnKeyType="go"
+                onSubmitEditing={handleLogin}
+              />
 
               <TouchableOpacity
-                style={styles.button}
-                onPress={handleLogin}
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeButton}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                }
+              >
+                <FontAwesome
+                  name={showPassword ? "eye-slash" : "eye"}
+                  size={21}
+                  color={COLORS.grisMedio}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* RECORDAR / RECUPERAR */}
+            <View style={styles.rowOptions}>
+              <TouchableOpacity
+                style={styles.rememberBox}
+                onPress={() => setRememberMe(!rememberMe)}
+                disabled={isLoading}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: rememberMe }}
+              >
+                <View
+                  style={[
+                    styles.checkbox,
+                    rememberMe && styles.checkboxChecked,
+                  ]}
+                >
+                  {rememberMe && (
+                    <FontAwesome name="check" size={12} color={COLORS.blanco} />
+                  )}
+                </View>
+
+                <Text style={styles.rememberText}>Recordarme</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Recuperar")}
                 disabled={isLoading}
               >
-                {isLoading ? (
-                  <ActivityIndicator color={COLORS.blanco} size="small" />
-                ) : (
-                  <Text style={styles.buttonText}>Ingresar</Text>
-                )}
-              </TouchableOpacity>
-
-              {errorMessage ? (
-                <View style={styles.errorContainer}>
-                  <FontAwesome name="exclamation-circle" size={16} color={COLORS.rojo} />
-                  <Text style={styles.errorText}>{errorMessage}</Text>
-                </View>
-              ) : null}
-
-              <TouchableOpacity onPress={() => navigation.navigate('Recuperar')}>
                 <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
               </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                <Text style={styles.signUpText}>
-                  ¿No tienes cuenta aún? <Text style={styles.linkText}>Regístrate</Text>
-                </Text>
-              </TouchableOpacity>
-              </View>
             </View>
+
+            {/* ERROR */}
+            {errorMessage ? (
+              <View style={styles.errorContainer}>
+                <FontAwesome
+                  name="exclamation-circle"
+                  size={18}
+                  color={COLORS.rojo}
+                />
+
+                <Text style={styles.errorText}>{errorMessage}</Text>
+              </View>
+            ) : null}
+
+            {/* BOTÓN */}
+            <TouchableOpacity
+              style={[styles.button, isLoading && styles.buttonDisabled]}
+              onPress={handleLogin}
+              disabled={isLoading}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+            >
+              {isLoading ? (
+                <ActivityIndicator color={COLORS.blanco} />
+              ) : (
+                <Text style={styles.buttonText}>Iniciar sesión</Text>
+              )}
+            </TouchableOpacity>
+
+            {/* REGISTRO */}
+            <View style={styles.registerContainer}>
+              <Text style={styles.registerText}>¿No tenés cuenta? </Text>
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate("SignUp")}
+                disabled={isLoading}
+              >
+                <Text style={styles.registerLink}>Registrate.</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

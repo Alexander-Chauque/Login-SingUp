@@ -1,177 +1,221 @@
-import { StyleSheet } from 'react-native';
-import { COLORS, FONTS } from './colors';
+import { StyleSheet } from "react-native";
+import { COLORS } from "./colors";
 
 export const loginStyles = StyleSheet.create({
-  container: {
+  // PANTALLA
+  screen: {
     flex: 1,
-    backgroundColor: '#626262',
-    padding: 20,
-    owerflow: 'hidden'
+    backgroundColor: "#FFFFFF",
+    overflow: "hidden",
   },
 
+  keyboardContainer: {
+    flex: 1,
+    width: "100%",
+    zIndex: 1,
+  },
+
+  // ONDA SUPERIOR: PAISAJE
+  topWaveContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 285,
+    overflow: "hidden",
+    zIndex: 1,
+  },
+
+  topWaveSvg: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    width: "100%",
+    height: "100%",
+  },
+
+  // ONDA INFERIOR: EMPANADAS
+  bottomWaveContainer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 190,
+    overflow: "hidden",
+    zIndex: 1,
+  },
+
+  bottomWaveSvg: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+  },
+
+  backgroundImage: {
+    width: "100%",
+    height: "100%",
+  },
+
+  // CONTENIDO DESPLAZABLE
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 170,
+    paddingBottom: 195,
+    paddingHorizontal: 20,
   },
 
+  // FORMULARIO
   card: {
-    backgroundColor: COLORS.blanco,
-    borderRadius: 24,
-    padding: 16,
-    width: 300,
-    height: 770,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-    borderTopWidth: 8,
-    borderTopColor: COLORS.naranja,
-  },
+    width: "100%",
+    maxWidth: 440,
+    alignSelf: "center",
 
-  formCard: {
-    width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E6E6E6',
-    paddingHorizontal: 22,
-    paddingTop: 24,
-    paddingBottom: 24,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.18,
-    shadowRadius: 4,
-    elevation: 5,
-  },
+    // Fondo blanco sólido
+    backgroundColor: "#FFFFFF",
+    opacity: 1,
 
-  circleTop: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: '#A77D48',
-    top: -80,
-    right: -80,
-  },
-  circleBottom: {
-    position: 'absolute',
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    backgroundColor: '#A77D48',
-    bottom: -100,
-    left: -100,
+    paddingHorizontal: 24,
+    paddingTop: 25,
+    paddingBottom: 25,
+
+    borderRadius: 28,
+
+    // Sombra suave
+    shadowColor: "#000000",
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
   },
 
   logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 15,
-    resizeMode: 'contain',
-    alignSelf: 'center',
-    borderRadius: 43,
+    width: 150,
+    height: 150,
+    alignSelf: "center",
+    marginBottom: 12,
   },
 
   title: {
-    fontSize: 26,
-    fontFamily: 'Oswald-bold',
-    color: COLORS.grisOscuro,
-    marginBottom: 8,
-    textAlign: 'center',
-    textTransform: 'uppercase',
-    fontWeight: 'bold'
+    fontSize: 30,
+    fontFamily: "Oswald-Bold",
+    color: "#222222",
+    textAlign: "center",
+    marginBottom: 4,
   },
 
   subtitle: {
-    fontSize: 13,
-    fontFamily: 'Oswald-bold',
-    color: COLORS.grisOscuro,
-    marginBottom: 20,
-    textAlign: 'center',
-    paddingHorizontal: 10,
+    fontSize: 16,
+    fontFamily: "SegoeUI",
+    fontWeight: "bold",
+    color: "#666666",
+    textAlign: "center",
+    marginBottom: 17,
   },
 
-  brandName: {
-    color: COLORS.naranja,
-    fontFamily: FONTS.titulo,
-    fontWeight: 'bold',
+  // PEQUEÑAS LÍNEAS DECORATIVAS
+  decorativeLines: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 9,
+    marginBottom: 28,
   },
 
-  colorLine: {
-    height: 4,
-    width: 80,
+  shortLine: {
+    width: 30,
+    height: 2,
+    backgroundColor: "#E9B66F",
+    borderRadius: 5,
+  },
+
+  mainLine: {
+    width: 48,
+    height: 7,
     backgroundColor: COLORS.naranja,
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 25,
+    borderRadius: 5,
   },
 
+  // ETIQUETAS
   label: {
-    alignSelf: 'flex-start',
-    fontSize: 14,
-    fontFamily: 'Oswald-bold',
-    fontWeight: 'bold',
-    color: COLORS.grisOscuro,
-    marginTop: 10,
-    marginBottom: 5,
-    textTransform: 'uppercase'
+    alignSelf: "flex-start",
+    fontSize: 16,
+    fontFamily: "Oswald-Bold",
+    color: "#222222",
+    marginBottom: 8,
+    marginTop: 6,
   },
 
+  // CAMPOS
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.bordeClaro,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingRight: 15,
-    marginBottom: 16,
-    width: '100%',
-    height: 50,
-    backgroundColor: COLORS.blanco,
-    alignSelf: 'flex-start',
-  },
-
-  inputFocused: {
-    borderColor: COLORS.naranja,
-    borderWidth: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    height: 58,
+    paddingHorizontal: 15,
+    marginBottom: 17,
+    borderWidth: 1.3,
+    borderColor: "#DDDDDD",
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
   },
 
   icon: {
-    marginRight: 10,
+    width: 27,
+    marginRight: 13,
+    textAlign: "center",
   },
 
   input: {
     flex: 1,
-    height: 40,
-    fontFamily: FONTS.cuerpo,
-    fontSize: 14,
-    color: COLORS.grisOscuro,
+    height: "100%",
+    paddingVertical: 0,
+    fontFamily: "SegoeUI",
+    fontSize: 15,
+    color: "#292929",
+    includeFontPadding: false,
   },
 
-  rememberContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 5,
-    marginBottom: 20,
-    width: '100%',
-    paddingLeft: 4,
+  eyeButton: {
+    padding: 7,
+    marginLeft: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  // RECORDAR / RECUPERAR
+  rowOptions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    rowGap: 12,
+    width: "100%",
+    marginTop: 2,
+    marginBottom: 22,
+  },
+
+  rememberBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 4,
   },
 
   checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: COLORS.naranja,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
+    width: 21,
+    height: 21,
+    borderWidth: 1.8,
+    borderColor: "#8A8A8A",
+    borderRadius: 5,
+    marginRight: 9,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   checkboxChecked: {
@@ -181,71 +225,84 @@ export const loginStyles = StyleSheet.create({
 
   rememberText: {
     fontSize: 14,
-    fontFamily: FONTS.cuerpo,
-    color: COLORS.grisOscuro,
-  },
-
-  button: {
-    backgroundColor: COLORS.naranja,
-    borderRadius: 10,
-    height: 50,
-    width: '80%',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-
-  buttonText: {
-    color: COLORS.blanco,
-    fontSize: 16,
-    fontFamily: 'Oswald-bold',
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
+    fontFamily: "SegoeUI",
+    color: "#444444",
   },
 
   forgotText: {
+    fontSize: 13,
+    fontFamily: "Segoeui-Bold",
     color: COLORS.naranja,
-    fontFamily: FONTS.cuerpo,
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 8,
-    marginBottom: 16,
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
   },
 
-  signUpText: {
-    marginTop: 10,
-    color: COLORS.grisOscuro,
-    fontFamily: FONTS.cuerpo,
-    fontSize: 14,
-    textAlign: 'center',
-  },
-
-  linkText: {
-    color: COLORS.naranja,
-    fontFamily: 'Oswald-bold',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-  },
-
+  // MENSAJE DE ERROR
   errorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFEBEE',
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 10,
-    marginBottom: 10,
-    width: '100%',
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    padding: 12,
+    marginBottom: 15,
+    borderRadius: 10,
+    backgroundColor: "#FFF0F0",
+    borderWidth: 1,
+    borderColor: "#FFD4D4",
+    gap: 9,
   },
 
   errorText: {
-    color: COLORS.rojo,
-    fontSize: 12,
-    fontFamily: FONTS.cuerpo,
-    marginLeft: 8,
     flex: 1,
+    fontSize: 13,
+    fontFamily: "SegoeUI",
+    color: COLORS.rojo,
+  },
+
+  // BOTÓN PRINCIPAL
+  button: {
+    width: "100%",
+    minHeight: 58,
+    paddingHorizontal: 12,
+    borderRadius: 13,
+    backgroundColor: COLORS.naranja,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 3,
+    shadowColor: "#A95B00",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.18,
+    shadowRadius: 5,
+  },
+
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+
+  buttonText: {
+    fontFamily: "Oswald-Bold",
+    fontSize: 19,
+    color: COLORS.blanco,
+  },
+
+  // ENLACE DE REGISTRO
+  registerContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
+    marginTop: 20,
+    marginBottom: 8,
+  },
+
+  registerText: {
+    fontSize: 14,
+    fontFamily: "SegoeUI",
+    color: "#555555",
+  },
+
+  registerLink: {
+    fontSize: 14,
+    fontFamily: "SegoeUI-Bold",
+    color: COLORS.naranja,
+    textDecorationLine: "underline",
   },
 });

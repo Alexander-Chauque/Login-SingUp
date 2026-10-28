@@ -102,7 +102,7 @@ export default function Terminos({ navigation }) {
   },
   title: {
       fontSize: 26,
-      fontFamily: FONTS.titulo,
+      fontFamily: 'Oswald-Bold',
       color: COLORS.grisOscuro,
       marginBottom: 8,
       textAlign: 'center',
@@ -117,7 +117,7 @@ export default function Terminos({ navigation }) {
   },
   sectionTitle: {
       fontSize: 16,
-      fontFamily: FONTS.titulo,
+      fontFamily: 'Oswald-Bold',
       color: COLORS.naranja,
       marginTop: 20,
       marginBottom: 8,
@@ -139,8 +139,7 @@ export default function Terminos({ navigation }) {
       marginBottom: 4,
   },
   bold: {
-      fontFamily: FONTS.titulo,
-      fontWeight: 'bold',
+      fontFamily: 'Oswald-Bold',
       color: COLORS.naranja,
   },
   finalText: {
@@ -167,8 +166,7 @@ export default function Terminos({ navigation }) {
   buttonText: {
       color: COLORS.blanco,
       fontSize: 16,
-      fontFamily: FONTS.titulo,
-      fontWeight: 'bold',
+      fontFamily: 'Oswald-Bold',
       textTransform: 'uppercase',
   },
   });

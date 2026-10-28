@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } 
 import { auth } from '../src/config/firebaseConfig';
 import { signUpStyles as styles } from '../styles/signUpStyles';
 import { COLORS } from '../styles/colors';
+import { ImageBackground } from 'react-native';
 
 export default function SignUp({ navigation }) {
   const [nombre, setNombre] = useState('');
@@ -153,9 +154,12 @@ export default function SignUp({ navigation }) {
   };
 
   return (
-  <View style={styles.container}>
-  <View style={styles.circleTop} />
-  <View style={styles.circleBottom} />
+  <ImageBackground
+    source={require('../assets/fondo1.png')} // Asegurate de que sea el mismo nombre que en el Login
+    style={styles.container}
+    resizeMode="cover"
+  >
+    <View style={styles.overlay} />
 
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -167,12 +171,14 @@ export default function SignUp({ navigation }) {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.card}>
-          <Image source={require('../assets/logo.jpg')} style={styles.logo} />
-          <Text style={styles.title}>Crear cuenta</Text>
+          <Image source={require('../assets/logo2.png')} style={styles.logo} />
 
-          <Text style={styles.subtitle}>
-            Registrate en <Text style={styles.brandName}>LOS CARDONES</Text>
-          </Text>
+          <Text style={styles.title}>SUMATE A <Text style={styles.brandName}>LOS CARDONES</Text></Text>
+          <Text style={styles.subtitle}>Creá tu cuenta para gestionar el restaurante</Text>
+
+          <View style={styles.colorLine} />
+
+          <Text style={styles.instructionText}>Completá tus datos para registrarte</Text>
 
           <View style={styles.infoCard}>
             <FontAwesome name='info-circle' size={16} color={COLORS.grisOscuro}/>
@@ -183,201 +189,199 @@ export default function SignUp({ navigation }) {
 
           <View style={styles.colorLine} />
 
-          <View style={styles.formCard}>
-            <Text style={styles.label}>Nombre</Text>
-            <View style={[styles.inputContainer, focusedField === 'nombre' && styles.inputFocused]}>
-              <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
-              <TextInput
-                  style={styles.input}
-                  placeholder="Ingrese su nombre"
-                  value={nombre}
-                  onChangeText={setNombre}
-                  onFocus={() => setFocusedField('nombre')}
-                  onBlur={() => setFocusedField(null)}
-              />
-            </View>
-
-            <Text style={styles.label}>Apellido</Text>
-            <View style={[styles.inputContainer, focusedField === 'apellido' && styles.inputFocused]}>
-              <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
-              <TextInput
+          <Text style={styles.label}>Nombre</Text>
+          <View style={[styles.inputContainer, focusedField === 'nombre' && styles.inputFocused]}>
+            <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
                 style={styles.input}
-                placeholder="Ingrese su apellido"
-                value={apellido}
-                onChangeText={setApellido}
-                onFocus={() => setFocusedField('apellido')}
+                placeholder="Ej: Usuario"
+                value={nombre}
+                onChangeText={setNombre}
+                onFocus={() => setFocusedField('nombre')}
                 onBlur={() => setFocusedField(null)}
-              />
-            </View>
+            />
+          </View>
 
-            <Text style={styles.label}>DNI</Text>
-            <View style={[styles.inputContainer, focusedField === 'dni' && styles.inputFocused]}>
-              <FontAwesome name="id-card" size={20} color={COLORS.grisMedio} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su DNI"
-                value={dni}
-                onChangeText={setDni}
-                keyboardType="numeric"
-                onFocus={() => setFocusedField('dni')}
-                onBlur={() => setFocusedField(null)}
-              />
-            </View>
+          <Text style={styles.label}>Apellido</Text>
+          <View style={[styles.inputContainer, focusedField === 'apellido' && styles.inputFocused]}>
+            <FontAwesome name="user" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ej: Peréz"
+              value={apellido}
+              onChangeText={setApellido}
+              onFocus={() => setFocusedField('apellido')}
+              onBlur={() => setFocusedField(null)}
+            />
+          </View>
 
-            <Text style={styles.label}>Correo electrónico</Text>
-            <View style={[styles.inputContainer, focusedField === 'email' && styles.inputFocused]}>
-              <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su correo"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onFocus={() => setFocusedField('email')}
-                onBlur={() => setFocusedField(null)}
-              />
-            </View>
+          <Text style={styles.label}>DNI</Text>
+          <View style={[styles.inputContainer, focusedField === 'dni' && styles.inputFocused]}>
+            <FontAwesome name="id-card" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ej: 38765432"
+              value={dni}
+              onChangeText={setDni}
+              keyboardType="numeric"
+              onFocus={() => setFocusedField('dni')}
+              onBlur={() => setFocusedField(null)}
+            />
+          </View>
 
-            <Text style={styles.label}>Teléfono</Text>
-            <View style={[styles.inputContainer, focusedField === 'telefono' && styles.inputFocused]}>
-              <FontAwesome name="phone" size={20} color={COLORS.grisMedio} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su teléfono"
-                value={telefono}
-                onChangeText={setTelefono}
-                keyboardType="phone-pad"
-                onFocus={() => setFocusedField('telefono')}
-                onBlur={() => setFocusedField(null)}
-              />
-            </View>
+          <Text style={styles.label}>Correo electrónico</Text>
+          <View style={[styles.inputContainer, focusedField === 'email' && styles.inputFocused]}>
+            <FontAwesome name="envelope" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ej. usuario@correo.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onFocus={() => setFocusedField('email')}
+              onBlur={() => setFocusedField(null)}
+            />
+          </View>
 
-            <Text style={styles.label}>Contraseña</Text>
-            <View style={[styles.inputContainer, focusedField === 'password' && styles.inputFocused]}>
-              <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su contraseña"
-                value={password}
-                onChangeText= {setPassword}
-                secureTextEntry={!showPassword}
-                onFocus={() => setFocusedField('password')}
-                onBlur={() => setFocusedField(null)}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
-              </TouchableOpacity>
-            </View>
+          <Text style={styles.label}>Teléfono</Text>
+          <View style={[styles.inputContainer, focusedField === 'telefono' && styles.inputFocused]}>
+            <FontAwesome name="phone" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Ej: 387 408 8656"
+              value={telefono}
+              onChangeText={setTelefono}
+              keyboardType="phone-pad"
+              onFocus={() => setFocusedField('telefono')}
+              onBlur={() => setFocusedField(null)}
+            />
+          </View>
 
-            {password.length > 0 && (
-                <View style={styles.requirementsContainer}>
-                  <View style={styles.requirementItem}>
-                    <FontAwesome
-                      name={password.length >= 8 ? 'check-circle' : 'times-circle'}
-                      size={12}
-                      color={password.length >= 8 ? COLORS.verde : COLORS.rojo}
-                      style={styles.requirementIcon}
-                    />
-                    <Text style={styles.requirementText}>Mínimo 8 caracteres</Text>
-                  </View>
-
-                  <View style={styles.requirementItem}>
-                    <FontAwesome
-                      name={/[A-Z]/.test(password) ? 'check-circle' : 'times-circle'}
-                      size={12}
-                      color={/[A-Z]/.test(password) ? COLORS.verde : COLORS.rojo}
-                      style={styles.requirementIcon}
-                    />
-                    <Text style={styles.requirementText}>Una letra mayúscula</Text>
-                  </View>
-
-                  <View style={styles.requirementItem}>
-                    <FontAwesome
-                      name={/[a-z]/.test(password) ? 'check-circle' : 'times-circle'}
-                      size={12}
-                      color={/[a-z]/.test(password) ? COLORS.verde : COLORS.rojo}
-                      style={styles.requirementIcon}
-                    />
-                    <Text style={styles.requirementText}>Una letra minúscula</Text>
-                  </View>
-
-                  <View style={styles.requirementItem}>
-                    <FontAwesome
-                      name={/\d/.test(password) ? 'check-circle' : 'times-circle'}
-                      size={12}
-                      color={/\d/.test(password) ? COLORS.verde : COLORS.rojo}
-                      style={styles.requirementIcon}
-                    />
-                    <Text style={styles.requirementText}>Un número</Text>
-                  </View>
-
-                  <View style={styles.requirementItem}>
-                    <FontAwesome
-                      name={/[!@#$%^&*_\-}]/.test(password) ? 'check-circle' : 'times-circle'}
-                      size={12}
-                      color={/[!@#$%^&*_\-]/.test(password) ? COLORS.verde : COLORS.rojo}
-                      style={styles.requirementIcon}
-                    />
-                    <Text style={styles.requirementText}>Un carácter especial (! @ # $ % ^ & _ -)</Text>
-                  </View>
-                </View>
-            )}
-
-            <Text style={styles.label}>Confirmar contraseña</Text>
-            <View style={[styles.inputContainer, focusedField === 'confirmPassword' && styles.inputFocused]}>
-              <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Confirme su contraseña"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry={!showConfirmPassword}
-                onFocus={() => setFocusedField('confirmPassword')}
-                onBlur={() => setFocusedField(null)}
-              />
-              <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                <FontAwesome name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
-              </TouchableOpacity>
-            </View>
-
-            {errorMessage ? (
-              <View style={styles.errorContainer}>
-                <FontAwesome name="exclamation-circle" size={16} color={COLORS.rojo} />
-                <Text style={styles.errorText}>{errorMessage}</Text>
-              </View>
-            ) : null}
-
-            <View style={styles.termsContainer}>
-              <TouchableOpacity
-                style={[styles.checkbox, acceptTerms && styles.checkboxChecked]}
-                onPress={() => setAcceptTerms(!acceptTerms)}>{acceptTerms && (
-                  <FontAwesome name="check" size={12} color={COLORS.blanco} />)}
-              </TouchableOpacity>
-              <Text style={styles.termsText}> Acepto los{' '}
-                <Text style={styles.termsLink} onPress={() => navigation.navigate('Terminos')}>
-                  términos y condiciones
-                </Text>
-              </Text>
-            </View>
-
-            <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={isLoading}>
-              {isLoading ? (
-                <ActivityIndicator color={COLORS.blanco} />
-              ) : (
-                <Text style={styles.buttonText}>Registrarse</Text>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.signUpText}>
-                ¿Ya estás registrado? <Text style={styles.linkText}>Inicia Sesión</Text>
-              </Text>
+          <Text style={styles.label}>Contraseña</Text>
+          <View style={[styles.inputContainer, focusedField === 'password' && styles.inputFocused]}>
+            <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Creá una contraseña segura"
+              value={password}
+              onChangeText= {setPassword}
+              secureTextEntry={!showPassword}
+              onFocus={() => setFocusedField('password')}
+              onBlur={() => setFocusedField(null)}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <FontAwesome name={showPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
             </TouchableOpacity>
           </View>
+
+          {password.length > 0 && (
+              <View style={styles.requirementsContainer}>
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={password.length >= 8 ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={password.length >= 8 ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Mínimo 8 caracteres</Text>
+                </View>
+
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={/[A-Z]/.test(password) ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={/[A-Z]/.test(password) ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Una letra mayúscula</Text>
+                </View>
+
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={/[a-z]/.test(password) ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={/[a-z]/.test(password) ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Una letra minúscula</Text>
+                </View>
+
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={/\d/.test(password) ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={/\d/.test(password) ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Un número</Text>
+                </View>
+
+                <View style={styles.requirementItem}>
+                  <FontAwesome
+                    name={/[!@#$%^&*_\-}]/.test(password) ? 'check-circle' : 'times-circle'}
+                    size={12}
+                    color={/[!@#$%^&*_\-]/.test(password) ? COLORS.verde : COLORS.rojo}
+                    style={styles.requirementIcon}
+                  />
+                  <Text style={styles.requirementText}>Un carácter especial (! @ # $ % ^ & _ -)</Text>
+                </View>
+              </View>
+          )}
+
+          <Text style={styles.label}>Confirmar contraseña</Text>
+          <View style={[styles.inputContainer, focusedField === 'confirmPassword' && styles.inputFocused]}>
+            <FontAwesome name="lock" size={20} color={COLORS.grisMedio} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Repetí tu contraseña"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+              onFocus={() => setFocusedField('confirmPassword')}
+              onBlur={() => setFocusedField(null)}
+            />
+            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+              <FontAwesome name={showConfirmPassword ? "eye-slash" : "eye"} size={20} color={COLORS.grisMedio} />
+            </TouchableOpacity>
+          </View>
+
+          {errorMessage ? (
+            <View style={styles.errorContainer}>
+              <FontAwesome name="exclamation-circle" size={16} color={COLORS.rojo} />
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+          ) : null}
+
+          <View style={styles.termsContainer}>
+            <TouchableOpacity
+              style={[styles.checkbox, acceptTerms && styles.checkboxChecked]}
+              onPress={() => setAcceptTerms(!acceptTerms)}>{acceptTerms && (
+                <FontAwesome name="check" size={12} color={COLORS.blanco} />)}
+            </TouchableOpacity>
+            <Text style={styles.termsText}> Acepto los{' '}
+              <Text style={styles.termsLink} onPress={() => navigation.navigate('Terminos')}>
+                términos y condiciones
+              </Text>
+            </Text>
+          </View>
+
+          <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={isLoading}>
+            {isLoading ? (
+              <ActivityIndicator color={COLORS.blanco} />
+            ) : (
+              <Text style={styles.buttonText}>Registrarse</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.signUpText}>
+              ¿Ya estás registrado? <Text style={styles.linkText}>Inicia Sesión</Text>
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  </View>
+  </ImageBackground>
   );
 }

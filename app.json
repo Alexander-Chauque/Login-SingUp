@@ -15,13 +15,15 @@
         "backgroundColor": "#626262",
         "foregroundImage": "./assets/favicon.png",
         "monochromeImage": "./assets/favicon.png"
-      }
+      },
+      "package": "com.loscardones.salta"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-status-bar"
     ]
   }
 }

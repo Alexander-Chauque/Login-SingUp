@@ -11,26 +11,6 @@ export const signUpStyles = StyleSheet.create({
       overflow: 'hidden',
   },
 
-  circleTop: {
-      position: 'absolute',
-      width: 200,
-      height: 200,
-      borderRadius: 100,
-      backgroundColor: '#A77D48',
-      top: -80,
-      right: -80,
-  },
-
-  circleBottom: {
-      position: 'absolute',
-      width: 200,
-      height: 200,
-      borderRadius: 100,
-      backgroundColor: '#A77D48',
-      bottom: -100,
-      left: -90,
-  },
-
   scrollContent: {
       flexGrow: 1,
       justifyContent: 'center',
@@ -82,12 +62,11 @@ export const signUpStyles = StyleSheet.create({
 
   title: {
       fontSize: 22,
-      fontFamily: FONTS.titulo,
+      fontFamily: 'Oswald-Bold',
       color: COLORS.grisOscuro,
       marginBottom: 5,
       textAlign: 'center',
       textTransform: 'uppercase',
-      fontWeight: 'bold'
   },
 
   subtitle: {
@@ -100,8 +79,7 @@ export const signUpStyles = StyleSheet.create({
 
   brandName: {
       color: COLORS.naranja,
-      fontFamily: FONTS.titulo,
-      fontWeight: 'bold',
+      fontFamily: 'Oswald-Bold',
   },
 
   colorLine: {
@@ -120,9 +98,7 @@ export const signUpStyles = StyleSheet.create({
       color: COLORS.grisOscuro,
       marginTop: 8,
       marginBottom: 4,
-      textTransform: 'uppercase',
-      fontWeight: 'bold'
-  },
+      textTransform: 'uppercase',  },
 
   inputContainer: {
       flexDirection: 'row',
@@ -188,8 +164,7 @@ export const signUpStyles = StyleSheet.create({
   buttonText: {
       color: COLORS.blanco,
       fontSize: 16,
-      fontFamily: FONTS.titulo,
-      fontWeight: 'bold',
+      fontFamily:  'Oswald-Bold',
       textTransform: 'uppercase',
   },
 
@@ -205,8 +180,7 @@ export const signUpStyles = StyleSheet.create({
 
   linkText: {
       color: COLORS.naranja,
-      fontFamily: FONTS.titulo,
-      fontWeight: 'bold',
+      fontFamily:  'Oswald-Bold',
       textDecorationLine: 'underline',
   },
 
@@ -263,7 +237,7 @@ export const signUpStyles = StyleSheet.create({
 
   termsLink: {
       color: COLORS.naranja,
-      fontFamily: FONTS.titulo,
+      fontFamily:  'Oswald-Bold',
       fontWeight: 'bold',
       textDecorationLine: 'underline',
   },
