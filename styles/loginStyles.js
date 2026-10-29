@@ -22,7 +22,7 @@ export const loginStyles = StyleSheet.create({
     borderRadius: 24,
     padding: 16,
     width: 300,
-    height: 720,
+    height: 770,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
