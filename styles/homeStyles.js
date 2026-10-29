@@ -1,96 +1,172 @@
-import { StyleSheet } from 'react-native';
-import { COLORS, FONTS } from './colors';
+import { StyleSheet } from "react-native";
+import { COLORS } from "./colors";
 
 export const homeStyles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#626262',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 5,
-        overflow: 'hidden',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+  },
 
-    circleTop: {
-        position: 'absolute',
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-        backgroundColor: '#A77D48',
-        top: -80,
-        right: -80,
-    },
+  // --- HEADER ---
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    backgroundColor: COLORS.grisOscuro,
+  },
+  logoSmall: {
+    width: 80,
+    height: 40,
+  },
+  avatarCircle: {
+    width: 35,
+    height: 35,
+    borderRadius: 18,
+    backgroundColor: "#FFE0B2",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  avatarText: {
+    fontFamily: "Oswald",
+    fontWeight: "bold",
+    color: COLORS.naranja,
+    fontSize: 14,
+  },
 
-    circleBottom: {
-        position: 'absolute',
-        width: 200,
-        height: 200,
-        borderRadius: 100,
-        backgroundColor: '#A77D48',
-        bottom: -100,
-        left: -90,
-    },
+  // --- CONTENIDO ---
+  scrollContent: {
+    padding: 20,
+  },
+  welcomeRow: {
+    flex: "flex",
+    flexDirection:'row',
+    alignItems: "center",
+    marginBottom: "5",
+  },
+  welcomeText: {
+    fontSize: 26,
+    fontFamily: "Oswald",
+    fontWeight: "bold",
+    color: COLORS.grisOscuro,
+    marginBottom: 5,
+  },
+  subtitleText: {
+    fontSize: 14,
+    fontFamily: "SegoeUI",
+    color: COLORS.grisMedio,
+    marginBottom: 20,
+  },
+  dateCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.blanco,
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  dateText: {
+    fontSize: 16,
+    fontFamily: "SegoeUI",
+    color: COLORS.grisOscuro,
+    marginLeft: 8,
+  },
 
-    card: {
-        backgroundColor: COLORS.blanco,
-        borderRadius: 24,
-        padding: 30,
-        width: '90%',
-        maxWidth: 400,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-        elevation: 5,
-        borderTopWidth: 6,
-        borderTopColor: COLORS.naranja,
-    },
+  // --- TARJETAS DE RESUMEN ---
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 25,
+  },
+  statCard: {
+    backgroundColor: COLORS.blanco,
+    width: "31%",
+    padding: 15,
+    borderRadius: 12,
+    alignItems: "flex-start",
+  },
+  statNumber: {
+    fontSize: 18,
+    fontFamily: "Oswald-Bold",
+    color: COLORS.grisOscuro,
+    marginTop: 8,
+  },
+  statLabel: {
+    fontSize: 10,
+    fontFamily: "Oswald",
+    color: COLORS.grisMedio,
+    marginTop: 2,
+  },
+  progressBarBg: {
+    width: "100%",
+    height: 4,
+    backgroundColor: "#E0E0E0",
+    borderRadius: 2,
+    marginTop: 8,
+  },
+  progressBarFill: {
+    width: "90%",
+    height: 4,
+    backgroundColor: COLORS.naranja,
+    borderRadius: 2,
+  },
 
-    logo: {
-        width: 120,
-        height: 120,
-        marginBottom: 20,
-        resizeMode: 'contain',
-    },
+  // --- GRILLA DE MÓDULOS ---
+  sectionTitleRow: {
+    flex: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontFamily: "Oswald",
+    fontWeight: "bold",
+    color: COLORS.grisOscuro,
+    marginBottom: 15,
+  },
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  gridItem: {
+    backgroundColor: COLORS.blanco,
+    width: "31%",
+    aspectRatio: 1,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  gridText: {
+    fontSize: 12,
+    fontFamily: "Oswald",
+    fontWeight: "bold",
+    color: COLORS.grisOscuro,
+    marginTop: 8,
+    textAlign: "center",
+  },
 
-    title: {
-        fontSize: 24,
-        fontFamily: FONTS.titulo,
-        color: COLORS.grisOscuro,
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-
-    subtitle: {
-        fontSize: 14,
-        fontFamily: FONTS.cuerpo,
-        color: COLORS.grisMedio,
-        marginBottom: 30,
-        textAlign: 'center',
-    },
-
-    brandName: {
-        color: COLORS.naranja,
-        fontFamily: FONTS.titulo,
-        fontWeight: 'bold',
-    },
-
-    logoutButton: {
-        backgroundColor: COLORS.rojo,
-        borderRadius: 10,
-        height: 50,
-        width: '80%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 20,
-    },
-
-    logoutText: {
-        color: COLORS.blanco,
-        fontSize: 16,
-        fontFamily: FONTS.titulo,
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
-    },
+  // --- BARRA INFERIOR ---
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: COLORS.blanco,
+    paddingVertical: 15,
+    paddingBottom: 25,
+    borderTopWidth: 1,
+    borderTopColor: "#EEE",
+  },
+  navItem: {
+    alignItems: "center",
+  },
+  navText: {
+    fontSize: 10,
+    fontFamily: "SegoeUI",
+    color: COLORS.grisMedio,
+    marginTop: 4,
+  },
 });

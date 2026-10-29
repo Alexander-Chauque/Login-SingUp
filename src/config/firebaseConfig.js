@@ -1,7 +1,12 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  initializeAuth,
+  getReactNativePersistence,
+} from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -12,20 +17,29 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-export const isFirebaseConfigured = Object.values(firebaseConfig).every(Boolean);
+// Verificamos si las variables de entorno están cargadas
+export const isFirebaseConfigured =
+  Object.values(firebaseConfig).every(Boolean);
 
+let app;
 let auth = null;
+let db = null;
+
 if (isFirebaseConfigured) {
-  const app = initializeApp(firebaseConfig);
-  if (Platform.OS === 'web'){
-  auth = getAuth(app);
-  }else{
+  app = initializeApp(firebaseConfig);
+  if (Platform.OS === "web") {
+    auth = getAuth(app);
+  } else {
     try {
-      auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+      auth = initializeAuth(app, {
+        persistence: getReactNativePersistence(AsyncStorage),
+      });
     } catch (error) {
-      if (error.code !== 'auth/already-initialized') throw error;
+      if (error.code !== "auth/already-initialized") throw error;
       auth = getAuth(app);
     }
   }
+  db = getFirestore(app);
 }
-export { auth };
+
+export { auth, db };
