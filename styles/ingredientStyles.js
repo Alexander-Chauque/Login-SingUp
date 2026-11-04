@@ -39,7 +39,6 @@ export const ingredientStyles = StyleSheet.create({
     backgroundColor: COLORS.blanco,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    overflow: "hidden",
   },
   scrollContent: {
     padding: 20,
@@ -141,6 +140,7 @@ export const ingredientStyles = StyleSheet.create({
 
   // --- TARJETAS DE INGREDIENTES ---
   tarjeta: {
+    position: "relative",
     flexDirection: "row",
     backgroundColor: COLORS.blanco,
     borderRadius: 16,
@@ -248,4 +248,41 @@ export const ingredientStyles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
+
+  
+  // --- MENU DESPLEGABLE DE ACCIONES ---
+  menuContenedor: {
+  backgroundColor: COLORS.blanco,
+  borderRadius: 12,
+  paddingVertical: 5,
+  borderWidth: 1,
+  borderColor: COLORS.bordeClaro,
+  elevation: 10,
+  zIndex: 1000,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 3 },
+  shadowOpacity: 0.18,
+  shadowRadius: 5,
+  },
+  opcionMenu: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+    gap: 10,
+  },
+  textoOpcionMenu: {
+    fontSize: 13,
+    color: COLORS.grisOscuro,
+    fontFamily: "SegoeUI",
+  },
+  opcionEliminar: {
+    borderTopWidth: 1,
+    borderTopColor: COLORS.bordeClaro,
+  },
+  textoEliminar: {
+    color: COLORS.rojo,
+    fontWeight: "bold",
+  },
+
 });

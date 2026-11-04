@@ -17,6 +17,7 @@ import Recuperar from "../screens/Recuperar";
 import Inventario from "../screens/Inventario";
 import ListaIngredientes from "../screens/ListaIngredientes"; 
 import FormularioIngrediente from "../screens/FormularioIngrediente";
+import DetalleIngrediente from "../screens/DetalleIngrediente";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -117,6 +118,11 @@ export default function Navigation() {
                 title: "Ingrediente",
                 headerTintColor: COLORS.naranja,
               }}
+            
+            />
+            <Stack.Screen
+              name="DetalleIngrediente"
+              component={DetalleIngrediente}
             />
           </>
         ) : (
