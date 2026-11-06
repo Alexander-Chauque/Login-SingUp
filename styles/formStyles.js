@@ -1,29 +1,37 @@
+// Formulario de ingredientes. Copia .tarjeta-formulario-mesa y .form-control de la web.
 import { StyleSheet } from "react-native";
 import { COLORS } from "./colors";
 
 export const formStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: COLORS.grisClaro,
   },
+  // Panel blanco que envuelve el formulario
   scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+    margin: 12,
+    padding: 16,
+    backgroundColor: COLORS.blanco,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
   },
 
   // Sección de la foto
   fotoContainer: {
     alignItems: "center",
-    marginBottom: 25,
-    marginTop: 10,
+    marginBottom: 10,
   },
   fotoBoton: {
     width: 120,
     height: 120,
-    borderRadius: 15,
-    backgroundColor: COLORS.grisClaro,
+    borderRadius: 12,
+    backgroundColor: "#FFF8E7",
     borderWidth: 2,
-    borderColor: COLORS.bordeClaro,
+    borderColor: "#FEEBC8",
     borderStyle: "dashed",
     justifyContent: "center",
     alignItems: "center",
@@ -36,91 +44,125 @@ export const formStyles = StyleSheet.create({
   },
   fotoTexto: {
     marginTop: 8,
-    color: COLORS.grisMedio,
-    fontSize: 12,
-    fontFamily: "SegoeUI",
-    fontWeight: "bold",
+    color: COLORS.naranjaOscuro,
+    fontSize: 13,
+    fontFamily: "Oswald-Bold",
+  },
+  fotoQuitar: {
+    marginTop: 8,
+    padding: 6,
+  },
+  fotoQuitarTexto: {
+    color: COLORS.rojo,
+    fontSize: 13,
+    fontWeight: "600",
   },
 
   // Campos del formulario
   label: {
     fontSize: 14,
-    fontFamily: "Oswald-Bold",
-    color: COLORS.grisOscuro,
-    marginBottom: 5,
+    fontWeight: "700",
+    color: "#2D3748",
+    marginBottom: 8,
     marginTop: 15,
   },
   input: {
-    backgroundColor: COLORS.blanco,
+    backgroundColor: "#F9FAFB",
     borderWidth: 1,
-    borderColor: COLORS.bordeClaro,
-    borderRadius: 10,
-    padding: 12,
-    color: COLORS.grisOscuro,
+    borderColor: "#E2E8F0",
+    borderRadius: 8,
+    minHeight: 46,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    color: "#2D3748",
     fontSize: 14,
-    fontFamily: "SegoeUI",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  col: {
-    width: "48%",
   },
 
-  // Switch de estado
-  switchRow: {
+  // Selector de unidad de medida
+  unidadesRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 25,
-    padding: 15,
-    backgroundColor: COLORS.blanco,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: COLORS.bordeClaro,
+    flexWrap: "wrap",
+    gap: 8,
   },
-  switchLabel: {
-    fontFamily: "Oswald-Bold",
-    color: COLORS.grisOscuro,
-    fontSize: 14,
+  unidadOpcion: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: COLORS.blanco,
+    borderWidth: 2,
+    borderColor: COLORS.bordeClaro,
+    borderRadius: 8,
+  },
+  unidadOpcionActiva: {
+    backgroundColor: COLORS.naranja,
+    borderColor: COLORS.naranja,
+  },
+  unidadTexto: {
+    color: "#4A4A4A",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  unidadTextoActivo: {
+    color: COLORS.blanco,
+  },
+
+  // Mensaje de error: .alert-error
+  errorContenedor: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 20,
+    padding: 12,
+    backgroundColor: "#FEE2E2",
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.rojo,
+    borderRadius: 8,
+  },
+  errorTexto: {
+    flex: 1,
+    color: "#991B1B",
+    fontSize: 13,
   },
 
   // Botones
   botonesRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 40,
+    justifyContent: "flex-end",
+    gap: 10,
+    marginTop: 24,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.grisClaro,
   },
   botonCancelar: {
     flex: 1,
-    backgroundColor: COLORS.grisClaro,
-    padding: 15,
-    borderRadius: 12,
+    minHeight: 44,
+    justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
-    borderWidth: 1,
+    backgroundColor: COLORS.blanco,
+    borderWidth: 2,
     borderColor: COLORS.bordeClaro,
+    borderRadius: 8,
   },
   textoCancelar: {
-    color: COLORS.grisOscuro,
-    fontWeight: "bold",
-    fontSize: 15,
+    color: "#333333",
+    fontFamily: "Oswald-Bold",
+    fontSize: 13,
+    textTransform: "uppercase",
   },
   botonGuardar: {
     flex: 1,
-    backgroundColor: COLORS.naranja,
-    padding: 15,
-    borderRadius: 12,
-    alignItems: "center",
-    marginLeft: 10,
+    minHeight: 44,
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: COLORS.naranja,
+    borderRadius: 8,
   },
   textoGuardar: {
     color: COLORS.blanco,
-    fontWeight: "bold",
-    fontSize: 15,
-    marginLeft: 8,
+    fontFamily: "Oswald-Bold",
+    fontSize: 13,
+    textTransform: "uppercase",
   },
 });

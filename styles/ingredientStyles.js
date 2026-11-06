@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 import { COLORS } from "./colors";
 
 export const ingredientStyles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F5F5" },
+  container: { flex: 1, backgroundColor: COLORS.blanco },
 
   // Header
   header: {
@@ -37,13 +37,27 @@ export const ingredientStyles = StyleSheet.create({
   mainCard: {
     flex: 1,
     backgroundColor: COLORS.blanco,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    overflow: "hidden",
   },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 100, // Espacio para el botón flotante
+  // flex: 1 para que la lista ocupe el resto de la pantalla y se pueda desplazar
+  contenido: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  lista: {
+    flex: 1,
+  },
+  // Mensajes de error y de lista vacía
+  mensajeContenedor: {
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 40,
+    paddingHorizontal: 10,
+  },
+  mensajeTexto: {
+    color: COLORS.grisOscuro,
+    fontSize: 14,
+    textAlign: "center",
   },
 
   // --- TÍTULO Y BOTÓN NUEVO ---
@@ -59,27 +73,34 @@ export const ingredientStyles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontFamily: "Oswald-Bold", // Usando tu fuente
-    color: "#3D3D3D",
+    color: "#222222",
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: "SegoeUI",
     color: COLORS.grisMedio,
     marginTop: 2,
+    marginBottom: 10,
   },
   botonNuevo: {
     backgroundColor: COLORS.naranja,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
+    justifyContent: "center",
+    minHeight: 48,
+    paddingHorizontal: 16,
+    borderRadius: 13,
+    elevation: 3,
+    shadowColor: "#A95B00",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.18,
+    shadowRadius: 5,
   },
   textoBotonNuevo: {
     color: COLORS.blanco,
-    fontWeight: "bold",
+    fontFamily: "Oswald-Bold",
     marginLeft: 4,
-    fontSize: 13,
+    fontSize: 16,
   },
 
   // --- BUSCADOR Y FILTROS ---
@@ -90,13 +111,13 @@ export const ingredientStyles = StyleSheet.create({
   inputBusqueda: {
     flex: 1,
     flexDirection: "row",
-    backgroundColor: COLORS.grisClaro,
-    borderRadius: 12,
-    paddingHorizontal: 12,
+    backgroundColor: COLORS.blanco,
+    borderRadius: 14,
+    minHeight: 52,
+    paddingHorizontal: 15,
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 1.3,
     borderColor: COLORS.bordeClaro,
-    marginRight: 10,
   },
   input: {
     flex: 1,
@@ -121,7 +142,7 @@ export const ingredientStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: COLORS.grisClaro,
+    backgroundColor: COLORS.blanco,
     marginRight: 10,
     borderWidth: 1,
     borderColor: COLORS.bordeClaro,
@@ -143,15 +164,15 @@ export const ingredientStyles = StyleSheet.create({
   tarjeta: {
     flexDirection: "row",
     backgroundColor: COLORS.blanco,
-    borderRadius: 16,
+    borderRadius: 14,
     padding: 12,
-    marginBottom: 16,
+    marginBottom: 12,
     borderWidth: 1,
-    borderColor: COLORS.bordeClaro,
+    borderColor: "#EAEAEA",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
     elevation: 2,
   },
   imagen: {
@@ -160,6 +181,10 @@ export const ingredientStyles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 12,
     backgroundColor: COLORS.grisClaro,
+  },
+  imagenVacia: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   infoContenedor: {
     flex: 1,

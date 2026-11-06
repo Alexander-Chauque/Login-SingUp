@@ -12,94 +12,46 @@ export const loginStyles = StyleSheet.create({
   keyboardContainer: {
     flex: 1,
     width: "100%",
-    zIndex: 1,
-  },
-
-  // ONDA SUPERIOR: PAISAJE
-  topWaveContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 285,
-    overflow: "hidden",
-    zIndex: 1,
-  },
-
-  topWaveSvg: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    width: "100%",
-    height: "100%",
-  },
-
-  // ONDA INFERIOR: EMPANADAS
-  bottomWaveContainer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 190,
-    overflow: "hidden",
-    zIndex: 1,
-  },
-
-  bottomWaveSvg: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-  },
-
-  backgroundImage: {
-    width: "100%",
-    height: "100%",
   },
 
   // CONTENIDO DESPLAZABLE
+  // flexGrow permite que ocupe toda la pantalla aunque el contenido sea más corto
   scrollContent: {
     flexGrow: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 170,
-    paddingBottom: 195,
-    paddingHorizontal: 20,
   },
 
   // FORMULARIO
+  // Sin fondo, sombra ni bordes redondeados: así se integra a la pantalla y no parece flotar
   card: {
     width: "100%",
     maxWidth: 440,
     alignSelf: "center",
+    paddingHorizontal: 28,
+    zIndex: 1, // Mantiene los textos delante de las imágenes
+  },
 
-    // Fondo blanco sólido
-    backgroundColor: "#FFFFFF",
-    opacity: 1,
+  // DIBUJOS DE FONDO
+  // position absolute los saca del orden normal: el formulario no se corre por ellos
+  decoracionHojas: {
+    position: "absolute",
+    left: 0,
+  },
 
-    paddingHorizontal: 24,
-    paddingTop: 25,
-    paddingBottom: 25,
+  decoracionEmpanada: {
+    position: "absolute",
+    right: 0,
+  },
 
-    borderRadius: 28,
-
-    // Sombra suave
-    shadowColor: "#000000",
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 6,
+  // Empuja las empanadas hacia abajo en pantallas altas
+  espacioLibre: {
+    flex: 1,
   },
 
   logo: {
-    width: 150,
-    height: 150,
+    width: 135,
+    height: 133,
     alignSelf: "center",
-    marginBottom: 12,
+    marginBottom: 8,
   },
 
   title: {
@@ -125,7 +77,7 @@ export const loginStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 9,
-    marginBottom: 28,
+    marginBottom: 18,
   },
 
   shortLine: {
@@ -157,9 +109,9 @@ export const loginStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    height: 58,
+    height: 52,
     paddingHorizontal: 15,
-    marginBottom: 17,
+    marginBottom: 12,
     borderWidth: 1.3,
     borderColor: "#DDDDDD",
     borderRadius: 14,
@@ -198,7 +150,7 @@ export const loginStyles = StyleSheet.create({
     rowGap: 12,
     width: "100%",
     marginTop: 2,
-    marginBottom: 22,
+    marginBottom: 16,
   },
 
   rememberBox: {
@@ -260,7 +212,7 @@ export const loginStyles = StyleSheet.create({
   // BOTÓN PRINCIPAL
   button: {
     width: "100%",
-    minHeight: 58,
+    minHeight: 52,
     paddingHorizontal: 12,
     borderRadius: 13,
     backgroundColor: COLORS.naranja,
@@ -289,8 +241,8 @@ export const loginStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexWrap: "wrap",
-    marginTop: 20,
-    marginBottom: 8,
+    marginTop: 16,
+    marginBottom: 4,
   },
 
   registerText: {

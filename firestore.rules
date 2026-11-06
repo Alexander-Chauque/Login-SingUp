@@ -1,0 +1,323 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Correo verificado: sin esto, alguien podría registrarse con el correo de un empleado
+    function verificado() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function correo() {
+      return request.auth.token.email.lower();
+    }
+
+    function miUsuario() {
+      return get(/databases/$(database)/documents/usuarios/$(correo())).data;
+    }
+
+    // Empleado activo que ya cambió su contraseña temporal
+    function esEmpleado() {
+      return verificado()
+        && miUsuario().activo == true
+        && miUsuario().debe_cambiar_contrasena == false;
+    }
+
+    // Permisos guardados en usuarios/{correo}. Ejemplo: "ingredientes:leer"
+    function tienePermiso(permiso) {
+      return esEmpleado() && permiso in miUsuario().permisos;
+    }
+
+    // Solo se gestiona a quien tiene un nivel menor al propio. El administrador gestiona a todos.
+    function gestiona(nivel) {
+      return miUsuario().nivel >= 5 || miUsuario().nivel > nivel;
+    }
+
+    // Los datos de cómo quedará un cargo al terminar la operación
+    function cargoDespues(idCargo) {
+      return getAfter(/databases/$(database)/documents/cargos/$(idCargo)).data;
+    }
+
+    // El nivel y los permisos de un usuario salen de su cargo: nadie los elige a mano.
+    // El administrador tiene todos los permisos, aunque su cargo no los tenga marcados.
+    function usuarioValido() {
+      let d = request.resource.data;
+      let cargo = cargoDespues(d.id_cargo);
+      return d.nivel == cargo.nivel_acceso
+        && d.cargo == cargo.nombre_cargo
+        && (cargo.nivel_acceso >= 5 || d.permisos.toSet() == cargo.permisos.toSet())
+        && d.activo is bool
+        && d.debe_cambiar_contrasena is bool
+        && gestiona(d.nivel);
+    }
+
+    function empleadoValido() {
+      let d = request.resource.data;
+      return d.nombre_empleado is string
+        && d.apellido_empleado is string
+        && d.dni is string
+        && d.estado is bool
+        && d.correo is string
+        && d.cargo is string
+        && d.nivel_cargo == cargoDespues(d.cargo).nivel_acceso
+        && gestiona(d.nivel_cargo);
+    }
+
+    function cargoValido() {
+      let d = request.resource.data;
+      return d.nombre_cargo is string
+        && d.nombre_cargo.size() > 0
+        && d.nivel_acceso is int
+        && d.nivel_acceso >= 1
+        && d.nivel_acceso <= 5
+        && d.permisos is list
+        && d.permisos_ids is list
+        && gestiona(d.nivel_acceso);
+    }
+
+    // Solo el administrador reparte permisos que no tiene. Quitarlos sí está permitido.
+    function permisosAgregadosPropios() {
+      return miUsuario().nivel >= 5
+        || request.resource.data.permisos.toSet()
+             .difference(resource.data.permisos.toSet())
+             .hasOnly(miUsuario().permisos);
+    }
+
+    function soloCambia(campos) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
+    }
+
+    function ingredienteValido() {
+      let d = request.resource.data;
+      return d.nombre_ingrediente is string
+        && d.nombre_ingrediente.size() > 0
+        && d.nombre_ingrediente.size() <= 100
+        && d.unidad_medida in ['kg', 'g', 'l', 'ml', 'u']
+        && d.costo_unitario is number
+        && d.costo_unitario >= 0
+        && d.estado_ingrediente is bool;
+    }
+
+    // exists() cumple la función de una clave foránea: la categoría tiene que existir
+    function platoValido() {
+      let d = request.resource.data;
+      return d.nombre_plato is string
+        && d.nombre_plato.size() > 0
+        && d.nombre_plato.size() <= 100
+        && d.precio_plato is number
+        && d.precio_plato > 0
+        && d.estado_plato is bool
+        && d.ingredientes_ids is list
+        && d.ingredientes_ids.size() > 0
+        && d.ingredientes is list
+        && d.categoria is string
+        && exists(/databases/$(database)/documents/categorias/$(d.categoria));
+    }
+
+    function bebidaValida() {
+      let d = request.resource.data;
+      return d.nombre_bebida is string
+        && d.nombre_bebida.size() > 0
+        && d.nombre_bebida.size() <= 50
+        && d.precio_bebida is number
+        && d.precio_bebida > 0
+        && d.disponible_bebida is bool
+        && d.id_tipo_bebida is string
+        && exists(/databases/$(database)/documents/tipos_bebida/$(d.id_tipo_bebida));
+    }
+
+    // Nadie puede cobrar más que el total ni guardar una comanda sin productos
+    function comandaValida() {
+      let d = request.resource.data;
+      return d.total_comanda is number
+        && d.total_comanda >= 0
+        && d.total_pagado is number
+        && d.total_pagado >= 0
+        && d.total_pagado <= d.total_comanda
+        && d.saldo_pendiente is number
+        && d.saldo_pendiente >= 0
+        && d.items is list
+        && d.items.size() > 0
+        && d.pagos is list
+        && d.estado_comanda in ['pendiente', 'en_preparacion', 'entregado', 'pagado', 'anulado'];
+    }
+
+    // Cada persona lee sus datos, aunque todavía deba cambiar la contraseña.
+    match /usuarios/{id} {
+      allow read: if verificado()
+        && (correo() == id || tienePermiso('empleados:leer') || tienePermiso('cargos:modificar'));
+      allow create: if tienePermiso('empleados:escribir')
+        && usuarioValido()
+        && request.resource.data.correo == id;
+      allow update: if
+        // Primer ingreso: cada uno solo puede marcar que ya cambió su contraseña
+        (verificado() && correo() == id
+          && soloCambia(['debe_cambiar_contrasena'])
+          && request.resource.data.debe_cambiar_contrasena == false)
+        // Editar a un empleado de nivel menor. Nadie se puede dar de baja a sí mismo.
+        || (tienePermiso('empleados:modificar')
+          && gestiona(resource.data.nivel)
+          && usuarioValido()
+          && request.resource.data.correo == resource.data.correo
+          && (correo() != id || request.resource.data.activo == true))
+        // Dar de baja o reactivar
+        || (tienePermiso('empleados:eliminar')
+          && gestiona(resource.data.nivel)
+          && soloCambia(['activo'])
+          && correo() != id)
+        // Un cargo cambió: se copia a sus empleados
+        || (tienePermiso('cargos:modificar')
+          && soloCambia(['cargo', 'nivel', 'permisos'])
+          && usuarioValido());
+      allow delete: if false;
+    }
+
+    match /empleados/{id} {
+      allow read: if tienePermiso('empleados:leer') || tienePermiso('cargos:modificar');
+      allow create: if tienePermiso('empleados:escribir') && empleadoValido();
+      allow update: if
+        (tienePermiso('empleados:modificar')
+          && gestiona(resource.data.nivel_cargo)
+          && empleadoValido()
+          && request.resource.data.correo == resource.data.correo
+          && (resource.data.correo != correo() || request.resource.data.estado == true))
+        || (tienePermiso('empleados:eliminar')
+          && gestiona(resource.data.nivel_cargo)
+          && soloCambia(['estado', 'fecha_baja'])
+          && resource.data.correo != correo())
+        || (tienePermiso('cargos:modificar')
+          && soloCambia(['cargo_nombre', 'nivel_cargo'])
+          && gestiona(request.resource.data.nivel_cargo));
+      allow delete: if false;
+    }
+
+    // No contiene sueldos: el formulario de empleados necesita elegir un cargo
+    match /cargos/{id} {
+      allow read: if tienePermiso('cargos:leer') || tienePermiso('empleados:leer');
+      allow create: if tienePermiso('cargos:escribir')
+        && cargoValido()
+        && request.resource.data.permisos.size() == 0
+        && request.resource.data.total_empleados == 0;
+      allow update: if
+        (tienePermiso('cargos:modificar')
+          && gestiona(resource.data.nivel_acceso)
+          && cargoValido()
+          && permisosAgregadosPropios()
+          && request.resource.data.total_empleados == resource.data.total_empleados)
+        // Al crear un empleado o cambiarlo de cargo, se actualiza el total
+        || ((tienePermiso('empleados:escribir') || tienePermiso('empleados:modificar'))
+          && soloCambia(['total_empleados']));
+      allow delete: if tienePermiso('cargos:eliminar')
+        && gestiona(resource.data.nivel_acceso)
+        && resource.data.total_empleados == 0;
+    }
+
+    match /sueldos/{id} {
+      allow read: if tienePermiso('cargos:leer');
+      allow write: if (tienePermiso('cargos:escribir') || tienePermiso('cargos:modificar'))
+        && request.resource.data.sueldo_cargo is number
+        && request.resource.data.sueldo_cargo >= 0
+        && gestiona(cargoDespues(id).nivel_acceso);
+      allow delete: if tienePermiso('cargos:eliminar');
+    }
+
+    match /permisos/{id} {
+      allow read: if tienePermiso('cargos:leer');
+      allow create: if tienePermiso('cargos:escribir')
+        && request.resource.data.modulo is string
+        && request.resource.data.accion is string;
+      // Eliminarlo se lo quita a todos los cargos
+      allow delete: if tienePermiso('cargos:eliminar') && miUsuario().nivel >= 5;
+    }
+
+    match /ingredientes/{id} {
+      // El formulario de platos necesita la lista de ingredientes
+      allow read: if tienePermiso('ingredientes:leer') || tienePermiso('platos:leer');
+      allow create: if tienePermiso('ingredientes:escribir') && ingredienteValido();
+      allow update: if tienePermiso('ingredientes:modificar') && ingredienteValido();
+      allow delete: if false;
+    }
+
+    match /platos/{id} {
+      // La pantalla de inicio cuenta los platos, y cualquier empleado puede verla
+      allow read: if esEmpleado();
+      allow create: if tienePermiso('platos:escribir') && platoValido();
+      // Quien gestiona ingredientes solo puede actualizar su copia y el estado del plato
+      allow update: if (tienePermiso('ingredientes:modificar')
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['ingredientes', 'estado_plato']))
+        || (tienePermiso('platos:modificar') && platoValido());
+      allow delete: if false;
+    }
+
+    match /categorias/{id} {
+      allow read: if tienePermiso('platos:leer');
+    }
+
+    // La pantalla de inicio también cuenta las bebidas
+    match /bebidas/{id} {
+      allow read: if esEmpleado();
+      allow create: if tienePermiso('bebidas:escribir') && bebidaValida();
+      allow update: if tienePermiso('bebidas:modificar') && bebidaValida();
+      allow delete: if false;
+    }
+
+    match /tipos_bebida/{id} {
+      allow read: if tienePermiso('bebidas:leer');
+    }
+
+    // La pantalla de inicio también cuenta estas colecciones
+    match /mesas/{id} {
+      allow read: if esEmpleado();
+      // Solo se puede cambiar el estado, no el número ni la ubicación.
+      // Crear, cobrar o anular una comanda también ocupa o libera la mesa.
+      allow update: if (tienePermiso('mesas:modificar')
+          || tienePermiso('comandas:escribir')
+          || tienePermiso('comandas:modificar'))
+        && request.resource.data.estado_mesa is bool
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado_mesa']);
+    }
+
+    match /comandas/{id} {
+      // Inicio y Mesas necesitan consultar las comandas abiertas
+      allow read: if esEmpleado();
+      // Una comanda nueva empieza pendiente, y queda a nombre de quien la crea
+      allow create: if tienePermiso('comandas:escribir')
+        && comandaValida()
+        && request.resource.data.estado_comanda == 'pendiente'
+        && request.resource.data.id_comanda == id
+        && request.resource.data.fecha_hora is timestamp
+        && request.resource.data.empleado == miUsuario().id_empleado
+        && exists(/databases/$(database)/documents/mesas/$(request.resource.data.mesa));
+      // Una comanda cerrada ya no cambia, y nunca cambian su mesa, su mozo ni su fecha
+      allow update: if tienePermiso('comandas:modificar')
+        && resource.data.estado_comanda in ['pendiente', 'en_preparacion', 'entregado']
+        && comandaValida()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+             'estado_comanda', 'estado_nombre', 'observaciones_comanda', 'total_comanda',
+             'total_pagado', 'saldo_pendiente', 'fecha_anulacion', 'motivo_anulacion',
+             'usuario_anulacion', 'items', 'pagos'
+           ]);
+      allow delete: if false;
+    }
+
+    // El registro de cambios: cada uno firma lo suyo, y nadie puede editarlo ni borrarlo
+    match /auditoria/{id} {
+      allow read: if tienePermiso('auditoria:leer');
+      allow create: if esEmpleado()
+        && request.resource.data.empleado == miUsuario().id_empleado
+        && request.resource.data.tabla is string
+        && request.resource.data.accion in ['CREAR', 'MODIFICAR', 'ANULAR', 'ELIMINAR']
+        && request.resource.data.fecha_hora is timestamp;
+      allow update, delete: if false;
+    }
+
+    // Numeración de las comandas: solo puede avanzar de a uno
+    match /contadores/comandas {
+      allow read: if tienePermiso('comandas:escribir');
+      allow update: if tienePermiso('comandas:escribir')
+        && request.resource.data.ultimo == resource.data.ultimo + 1;
+    }
+
+    // Todo lo que no esté indicado arriba queda bloqueado
+  }
+}
