@@ -40,6 +40,19 @@ import FormularioPermiso from "../screens/FormularioPermiso";
 import ListaVentas from "../screens/ListaVentas";
 import Reportes from "../screens/Reportes";
 import Auditoria from "../screens/Auditoria";
+import ListaCatalogo from "../screens/ListaCatalogo";
+import FormularioCatalogo from "../screens/FormularioCatalogo";
+import FormularioMesa from "../screens/FormularioMesa";
+import ListaAsistencias from "../screens/ListaAsistencias";
+import FormularioAsistencia from "../screens/FormularioAsistencia";
+import Finanzas from "../screens/Finanzas";
+import ListaCajas from "../screens/ListaCajas";
+import FormularioCaja from "../screens/FormularioCaja";
+import DetalleCaja from "../screens/DetalleCaja";
+import ListaGastos from "../screens/ListaGastos";
+import FormularioGasto from "../screens/FormularioGasto";
+import ComprobanteComanda from "../screens/ComprobanteComanda";
+import MiCuenta from "../screens/MiCuenta";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -196,6 +209,19 @@ export default function Navigation() {
             <Stack.Screen name="ListaVentas" component={ListaVentas} options={conEncabezado} />
             <Stack.Screen name="Reportes" component={Reportes} options={conEncabezado} />
             <Stack.Screen name="Auditoria" component={Auditoria} options={conEncabezado} />
+            <Stack.Screen name="ListaCatalogo" component={ListaCatalogo} options={conEncabezado} />
+            <Stack.Screen name="FormularioCatalogo" component={FormularioCatalogo} options={conTitulo} />
+            <Stack.Screen name="FormularioMesa" component={FormularioMesa} options={conTitulo} />
+            <Stack.Screen name="ListaAsistencias" component={ListaAsistencias} options={conEncabezado} />
+            <Stack.Screen name="FormularioAsistencia" component={FormularioAsistencia} options={conTitulo} />
+            <Stack.Screen name="Finanzas" component={Finanzas} options={conEncabezado} />
+            <Stack.Screen name="ListaCajas" component={ListaCajas} options={conEncabezado} />
+            <Stack.Screen name="FormularioCaja" component={FormularioCaja} options={conTitulo} />
+            <Stack.Screen name="DetalleCaja" component={DetalleCaja} options={conEncabezado} />
+            <Stack.Screen name="ListaGastos" component={ListaGastos} options={conEncabezado} />
+            <Stack.Screen name="FormularioGasto" component={FormularioGasto} options={conTitulo} />
+            <Stack.Screen name="ComprobanteComanda" component={ComprobanteComanda} options={conTitulo} />
+            <Stack.Screen name="MiCuenta" component={MiCuenta} options={conTitulo} />
           </>
         ) : (
           // --- RUTAS PARA USUARIOS NO LOGUEADOS ---

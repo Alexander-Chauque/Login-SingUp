@@ -728,6 +728,46 @@ export function cambiarEstadoComanda(id, nuevoEstado, motivo = "") {
   });
 }
 
+// Solo se elimina si sigue abierta y no tiene pagos. Libera la mesa.
+export function eliminarComanda(id) {
+  return conMensaje(async () => {
+    const usuario = await obtenerUsuarioActual();
+    await runTransaction(db, async (transaccion) => {
+      const referencia = doc(db, "comandas", id);
+      const documento = await transaccion.get(referencia);
+      if (!documento.exists()) throw new Error("Esta comanda ya no existe.");
+      const comanda = documento.data();
+      if (!estaAbierta(comanda) || comanda.pagos.length) {
+        throw new Error(`La comanda #${id} ya tiene pagos o está cerrada: no se puede eliminar.`);
+      }
+      transaccion.delete(referencia);
+      transaccion.update(doc(db, "mesas", comanda.mesa), { estado_mesa: true });
+      auditar(transaccion, usuario, {
+        tabla: "Comanda",
+        accion: "ELIMINAR",
+        registro: id,
+        anterior: `Mesa: ${comanda.mesa_numero}. Total: $${comanda.total_comanda}`,
+        actual: "Comanda eliminada",
+      });
+    });
+  });
+}
+
+// Los métodos activos del catálogo. Si todavía no se cargó ninguno, los de siempre.
+export function listarMetodosParaCobro() {
+  return conMensaje(async () => {
+    const resultado = await getDocs(collection(db, "metodos_pago"));
+    if (resultado.empty) {
+      return Object.entries(METODOS_DE_PAGO).map(([valor, nombre]) => ({ valor, nombre }));
+    }
+    return resultado.docs
+      .map((documento) => documento.data())
+      .filter((metodo) => metodo.estado_metodo_pago)
+      .map((metodo) => ({ valor: metodo.id_metodo_pago, nombre: metodo.nombre_metodo_pago }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+  });
+}
+
 // Guarda el pago y cierra la comanda si queda sin saldo
 export function registrarPagoComanda(id, { tipoPago, metodoPago, montoTexto }) {
   return conMensaje(async () => {
@@ -739,7 +779,11 @@ export function registrarPagoComanda(id, { tipoPago, metodoPago, montoTexto }) {
       if (!documento.exists()) throw new Error("Esta comanda ya no existe.");
       const comanda = documento.data();
       if (!estaAbierta(comanda)) throw new Error(`La comanda #${id} ya está cerrada.`);
-      if (!METODOS_DE_PAGO[metodoPago]) throw new Error("Seleccioná un método de pago válido.");
+      const delCatalogo = metodoPago ? await transaccion.get(doc(db, "metodos_pago", metodoPago)) : null;
+      const nombreMetodo = delCatalogo?.exists()
+        ? delCatalogo.data().estado_metodo_pago && delCatalogo.data().nombre_metodo_pago
+        : METODOS_DE_PAGO[metodoPago];
+      if (!nombreMetodo) throw new Error("Seleccioná un método de pago válido.");
 
       const saldo = comanda.saldo_pendiente;
       let monto;
@@ -770,7 +814,7 @@ export function registrarPagoComanda(id, { tipoPago, metodoPago, montoTexto }) {
             id_pago: `${id}-${comanda.pagos.length + 1}`,
             monto,
             metodo: metodoPago,
-            metodo_nombre: METODOS_DE_PAGO[metodoPago],
+            metodo_nombre: nombreMetodo,
             fecha_hora: Timestamp.now(),
             empleado: usuario.id_empleado,
           },
@@ -787,7 +831,7 @@ export function registrarPagoComanda(id, { tipoPago, metodoPago, montoTexto }) {
         accion: "MODIFICAR",
         registro: id,
         anterior: `Estado: ${comanda.estado_comanda}. Saldo: $${saldo}`,
-        actual: `Estado: ${cambios.estado_comanda || comanda.estado_comanda}. Pago: $${monto} (${metodoPago}). Saldo: $${saldoRestante}`,
+        actual: `Estado: ${cambios.estado_comanda || comanda.estado_comanda}. Pago: $${monto} (${nombreMetodo}). Saldo: $${saldoRestante}`,
       });
     });
     return obtenerComanda(id);

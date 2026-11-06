@@ -19,6 +19,8 @@ const MODULOS = [
   { clave: "cargos", nombre: "Cargos" },
   { clave: "mesas", nombre: "Mesas" },
   { clave: "comandas", nombre: "Comandas" },
+  { clave: "ventas", nombre: "Ventas" },
+  { clave: "caja", nombre: "Caja" },
   { clave: "reportes", nombre: "Reportes" },
   { clave: "auditoria", nombre: "Auditoría" },
 ];
@@ -30,7 +32,7 @@ const ACCIONES = [
 ];
 
 // Pestaña "Más": datos de la cuenta, permisos y cierre de sesión
-export default function Mas() {
+export default function Mas({ navigation }) {
   const usuario = auth.currentUser;
   const [yo, setYo] = useState(null);
   const [errorDatos, setErrorDatos] = useState("");
@@ -52,7 +54,7 @@ export default function Mas() {
     }, []),
   );
 
-  // Envía el enlace de Firebase: esta contraseña es la de la app, no la de la web
+  // Envía el enlace de Firebase, por si no recuerda la contraseña actual
   const cambiarContrasena = async () => {
     setError("");
     setAviso("");
@@ -160,9 +162,19 @@ export default function Mas() {
           </TouchableOpacity>
         ) : null}
 
-        <TouchableOpacity style={g.botonSecundario} onPress={cambiarContrasena} disabled={enviando}>
+        <TouchableOpacity style={g.botonSecundario} onPress={() => navigation.navigate("MiCuenta", { seccion: "telefono" })}>
+          <MaterialIcons name="phone" size={20} color="#333333" />
+          <Text style={g.botonSecundarioTexto}>Editar mi teléfono</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={g.botonSecundario} onPress={() => navigation.navigate("MiCuenta", { seccion: "contrasena" })}>
           <MaterialIcons name="key" size={20} color="#333333" />
           <Text style={g.botonSecundarioTexto}>Cambiar contraseña</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={g.botonSecundario} onPress={cambiarContrasena} disabled={enviando}>
+          <MaterialIcons name="mail-outline" size={20} color="#333333" />
+          <Text style={g.botonSecundarioTexto}>Olvidé mi contraseña: enviar enlace</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={g.botonPeligro} onPress={cerrarSesion} disabled={saliendo}>

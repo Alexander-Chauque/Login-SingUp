@@ -4,6 +4,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import {
   cambiarEstadoComanda,
+  eliminarComanda,
+  listarMetodosParaCobro,
   obtenerComanda,
   obtenerPermisos,
   registrarPagoComanda,
@@ -18,14 +20,6 @@ const ESTADOS = [
   { valor: "entregado", nombre: "Entregado" },
 ];
 
-// Los métodos de pago que acepta el sistema
-const METODOS = [
-  { valor: "efectivo", nombre: "Efectivo" },
-  { valor: "tarjeta", nombre: "Tarjeta" },
-  { valor: "transferencia", nombre: "Transferencia" },
-  { valor: "mercadopago", nombre: "Mercado Pago" },
-];
-
 export default function DetalleComanda({ route, navigation }) {
   const { id } = route.params;
   const [comanda, setComanda] = useState(null);
@@ -36,6 +30,7 @@ export default function DetalleComanda({ route, navigation }) {
   // Panel abierto: null, "pago" o "anular"
   const [panel, setPanel] = useState(null);
   const [tipoPago, setTipoPago] = useState("total");
+  const [metodos, setMetodos] = useState([]);
   const [metodo, setMetodo] = useState(null);
   const [monto, setMonto] = useState("");
   const [motivo, setMotivo] = useState("");
@@ -44,9 +39,14 @@ export default function DetalleComanda({ route, navigation }) {
   const cargar = useCallback(async () => {
     try {
       setError("");
-      const [datos, permisosUsuario] = await Promise.all([obtenerComanda(id), obtenerPermisos()]);
+      const [datos, permisosUsuario, metodosActivos] = await Promise.all([
+        obtenerComanda(id),
+        obtenerPermisos(),
+        listarMetodosParaCobro(),
+      ]);
       setComanda(datos);
       setPermisos(permisosUsuario);
+      setMetodos(metodosActivos);
     } catch (e) {
       setError(e.message);
     }
@@ -68,6 +68,19 @@ export default function DetalleComanda({ route, navigation }) {
       } catch (e) {
         mostrarAviso("No se pudo cambiar", e.message);
       } finally {
+        setOcupado(false);
+      }
+    });
+  };
+
+  const eliminar = () => {
+    confirmar("Eliminar comanda", `¿Querés eliminar la comanda #${id}? La mesa se liberará y no se puede deshacer.`, async () => {
+      setOcupado(true);
+      try {
+        await eliminarComanda(id);
+        navigation.goBack();
+      } catch (e) {
+        mostrarAviso("No se pudo eliminar", e.message);
         setOcupado(false);
       }
     });
@@ -207,6 +220,24 @@ export default function DetalleComanda({ route, navigation }) {
         </View>
       ) : null}
 
+      <View style={[g.fila, { marginBottom: 12 }]}>
+        <TouchableOpacity style={[g.botonSecundario, { flex: 1 }]} onPress={() => navigation.navigate("ComprobanteComanda", { id, tipo: "ticket" })}>
+          <MaterialIcons name="receipt" size={18} color="#333333" />
+          <Text style={g.botonSecundarioTexto}>Ticket</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[g.botonSecundario, { flex: 1 }]} onPress={() => navigation.navigate("ComprobanteComanda", { id, tipo: "comprobante" })}>
+          <MaterialIcons name="description" size={18} color="#333333" />
+          <Text style={g.botonSecundarioTexto}>Comprobante</Text>
+        </TouchableOpacity>
+      </View>
+
+      {comanda.puede_modificarse && permisos.includes("comandas:eliminar") ? (
+        <TouchableOpacity style={[g.botonPeligro, { marginBottom: 12 }]} onPress={eliminar} disabled={ocupado}>
+          <MaterialIcons name="delete" size={18} color={COLORS.blanco} />
+          <Text style={g.botonPeligroTexto}>Eliminar comanda</Text>
+        </TouchableOpacity>
+      ) : null}
+
       {abierta && puedeModificar ? (
         <>
           <Text style={g.seccion}>Estado</Text>
@@ -267,7 +298,7 @@ export default function DetalleComanda({ route, navigation }) {
           ) : null}
           <Text style={g.seccion}>Método de pago *</Text>
           <View style={g.opciones}>
-            {METODOS.map((opcion) => (
+            {metodos.map((opcion) => (
               <TouchableOpacity key={opcion.valor} style={[g.opcion, metodo === opcion.valor && g.opcionActiva]} onPress={() => setMetodo(opcion.valor)}>
                 <Text style={[g.opcionTexto, metodo === opcion.valor && g.opcionTextoActivo]}>{opcion.nombre}</Text>
               </TouchableOpacity>

@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from "react
 import { useFocusEffect } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 
+import { eliminarMesa } from "../src/config/catalogos";
 import { cambiarEstadoMesa, listarMesas, obtenerPermisos } from "../src/config/firestore";
 import { confirmar, mostrarAviso } from "../src/utils/ayudas";
 import { COLORS } from "../styles/colors";
@@ -20,7 +21,7 @@ const COLUMNAS = {
   numero: { width: 24 },
   ubicacion: { flex: 1 },
   estado: { width: 74 },
-  acciones: { width: 98 },
+  acciones: { width: 98, flexWrap: "wrap" },
 };
 
 export default function ListaMesas({ navigation }) {
@@ -63,6 +64,17 @@ export default function ListaMesas({ navigation }) {
         setMesas((lista) => lista.map((m) => (m.id_mesa === actualizada.id_mesa ? actualizada : m)));
       } catch (e) {
         mostrarAviso("No se pudo cambiar", e.message);
+      }
+    });
+  };
+
+  const eliminar = (mesa) => {
+    confirmar("Eliminar mesa", `¿Querés eliminar la mesa ${mesa.numero_mesa}? No se puede deshacer.`, async () => {
+      try {
+        await eliminarMesa(mesa);
+        cargar();
+      } catch (e) {
+        mostrarAviso("No se pudo eliminar", e.message);
       }
     });
   };
@@ -115,6 +127,22 @@ export default function ListaMesas({ navigation }) {
             onPress={() => cambiarEstado(item)}
           />
         ) : null}
+        {puedeCambiar ? (
+          <BotonIcono
+            icono="edit"
+            tipo="editar"
+            etiqueta={`Editar la mesa ${item.numero_mesa}`}
+            onPress={() => navigation.navigate("FormularioMesa", { id: item.id_mesa })}
+          />
+        ) : null}
+        {permisos.includes("mesas:eliminar") && !item.comanda_abierta ? (
+          <BotonIcono
+            icono="delete"
+            tipo="baja"
+            etiqueta={`Eliminar la mesa ${item.numero_mesa}`}
+            onPress={() => eliminar(item)}
+          />
+        ) : null}
       </View>
     </View>
   );
@@ -159,7 +187,14 @@ export default function ListaMesas({ navigation }) {
               icono="table-restaurant"
               titulo="Mesas"
               subtitulo={`${ocupadas} de ${mesas.length} ocupadas`}
-            />
+            >
+              {permisos.includes("mesas:escribir") ? (
+                <TouchableOpacity style={g.boton} onPress={() => navigation.navigate("FormularioMesa")}>
+                  <MaterialIcons name="add" size={18} color={COLORS.blanco} />
+                  <Text style={g.botonTexto}>Nueva mesa</Text>
+                </TouchableOpacity>
+              ) : null}
+            </EncabezadoPagina>
             <PanelFiltros>
               <View style={g.opciones}>
                 {["Todas", "Disponibles", "Ocupadas"].map((nombre) => (

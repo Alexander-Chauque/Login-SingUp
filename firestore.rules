@@ -86,6 +86,33 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
     }
 
+    function catalogoValido(campoNombre) {
+      return request.resource.data[campoNombre] is string
+        && request.resource.data[campoNombre].size() > 0;
+    }
+
+    function mesaValida() {
+      let d = request.resource.data;
+      return d.numero_mesa is int
+        && d.numero_mesa >= 1
+        && d.ubicacion in ['salon', 'patio']
+        && d.estado_mesa is bool;
+    }
+
+    // La fecha llega como texto: 2026-11-06
+    function fechaNoFutura(fecha) {
+      return timestamp.date(int(fecha[0:4]), int(fecha[5:7]), int(fecha[8:10])) <= request.time;
+    }
+
+    function gastoValido() {
+      let d = request.resource.data;
+      return d.descripcion is string
+        && d.descripcion.size() > 0
+        && d.monto is number
+        && d.monto > 0
+        && exists(/databases/$(database)/documents/categorias_gasto/$(d.categoria));
+    }
+
     function ingredienteValido() {
       let d = request.resource.data;
       return d.nombre_ingrediente is string
@@ -153,6 +180,8 @@ service cloud.firestore {
         (verificado() && correo() == id
           && soloCambia(['debe_cambiar_contrasena'])
           && request.resource.data.debe_cambiar_contrasena == false)
+        // Cada uno puede cambiar su propio teléfono
+        || (esEmpleado() && correo() == id && soloCambia(['telefono']))
         // Editar a un empleado de nivel menor. Nadie se puede dar de baja a sí mismo.
         || (tienePermiso('empleados:modificar')
           && gestiona(resource.data.nivel)
@@ -175,7 +204,9 @@ service cloud.firestore {
       allow read: if tienePermiso('empleados:leer') || tienePermiso('cargos:modificar');
       allow create: if tienePermiso('empleados:escribir') && empleadoValido();
       allow update: if
-        (tienePermiso('empleados:modificar')
+        // Cada uno puede cambiar su propio teléfono
+        (esEmpleado() && resource.data.correo == correo() && soloCambia(['telefono']))
+        || (tienePermiso('empleados:modificar')
           && gestiona(resource.data.nivel_cargo)
           && empleadoValido()
           && request.resource.data.correo == resource.data.correo
@@ -245,12 +276,17 @@ service cloud.firestore {
       allow update: if (tienePermiso('ingredientes:modificar')
           && request.resource.data.diff(resource.data).affectedKeys()
                .hasOnly(['ingredientes', 'estado_plato']))
-        || (tienePermiso('platos:modificar') && platoValido());
+        || (tienePermiso('platos:modificar') && platoValido())
+        // Al renombrar una categoría, se actualiza la copia de su nombre
+        || (tienePermiso('categorias:modificar') && soloCambia(['categoria_nombre']));
       allow delete: if false;
     }
 
     match /categorias/{id} {
-      allow read: if tienePermiso('platos:leer');
+      allow read: if tienePermiso('categorias:leer') || tienePermiso('platos:leer');
+      allow create: if tienePermiso('categorias:escribir') && catalogoValido('nombre_categoria_plato');
+      allow update: if tienePermiso('categorias:modificar') && catalogoValido('nombre_categoria_plato');
+      allow delete: if tienePermiso('categorias:eliminar');
     }
 
     // La pantalla de inicio también cuenta las bebidas
@@ -263,18 +299,50 @@ service cloud.firestore {
 
     match /tipos_bebida/{id} {
       allow read: if tienePermiso('bebidas:leer');
+      allow create: if tienePermiso('bebidas:escribir') && catalogoValido('nombre_tipo_bebida');
+      allow update: if tienePermiso('bebidas:modificar') && catalogoValido('nombre_tipo_bebida');
+      allow delete: if tienePermiso('bebidas:eliminar');
+    }
+
+    match /tipos_asistencia/{id} {
+      allow read: if tienePermiso('empleados:leer');
+      allow create: if tienePermiso('empleados:escribir') && catalogoValido('nombre_tipo_asis');
+      allow update: if tienePermiso('empleados:modificar') && catalogoValido('nombre_tipo_asis');
+      allow delete: if tienePermiso('empleados:eliminar');
+    }
+
+    // El id es empleado_fecha: un empleado no puede tener dos asistencias el mismo día
+    match /asistencias/{id} {
+      allow read: if tienePermiso('empleados:leer');
+      allow create: if tienePermiso('empleados:escribir')
+        && request.resource.data.id_asistencia == id
+        && id == request.resource.data.empleado + '_' + request.resource.data.fecha
+        && fechaNoFutura(request.resource.data.fecha)
+        && exists(/databases/$(database)/documents/empleados/$(request.resource.data.empleado))
+        && exists(/databases/$(database)/documents/tipos_asistencia/$(request.resource.data.tipo));
+      // Solo se puede cambiar el turno
+      allow update: if tienePermiso('empleados:modificar')
+        && soloCambia(['tipo', 'tipo_nombre'])
+        && exists(/databases/$(database)/documents/tipos_asistencia/$(request.resource.data.tipo));
+      allow delete: if tienePermiso('empleados:eliminar');
     }
 
     // La pantalla de inicio también cuenta estas colecciones
     match /mesas/{id} {
       allow read: if esEmpleado();
-      // Solo se puede cambiar el estado, no el número ni la ubicación.
-      // Crear, cobrar o anular una comanda también ocupa o libera la mesa.
-      allow update: if (tienePermiso('mesas:modificar')
-          || tienePermiso('comandas:escribir')
-          || tienePermiso('comandas:modificar'))
-        && request.resource.data.estado_mesa is bool
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado_mesa']);
+      allow create: if tienePermiso('mesas:escribir') && mesaValida() && request.resource.data.id_mesa == id;
+      // Crear, cobrar o anular una comanda también ocupa o libera la mesa
+      allow update: if ((tienePermiso('mesas:modificar')
+            || tienePermiso('comandas:escribir')
+            || tienePermiso('comandas:modificar')
+            || tienePermiso('comandas:eliminar'))
+          && request.resource.data.estado_mesa is bool
+          && soloCambia(['estado_mesa']))
+        // Editar el número y la ubicación
+        || (tienePermiso('mesas:modificar')
+          && mesaValida()
+          && soloCambia(['numero_mesa', 'ubicacion', 'ubicacion_nombre']));
+      allow delete: if tienePermiso('mesas:eliminar');
     }
 
     match /comandas/{id} {
@@ -297,7 +365,10 @@ service cloud.firestore {
              'total_pagado', 'saldo_pendiente', 'fecha_anulacion', 'motivo_anulacion',
              'usuario_anulacion', 'items', 'pagos'
            ]);
-      allow delete: if false;
+      // Solo si sigue abierta y sin pagos
+      allow delete: if tienePermiso('comandas:eliminar')
+        && resource.data.estado_comanda in ['pendiente', 'en_preparacion', 'entregado']
+        && resource.data.pagos.size() == 0;
     }
 
     // El registro de cambios: cada uno firma lo suyo, y nadie puede editarlo ni borrarlo
@@ -309,6 +380,78 @@ service cloud.firestore {
         && request.resource.data.accion in ['CREAR', 'MODIFICAR', 'ANULAR', 'ELIMINAR']
         && request.resource.data.fecha_hora is timestamp;
       allow update, delete: if false;
+    }
+
+    match /categorias_gasto/{id} {
+      allow read: if tienePermiso('caja:leer');
+      allow create: if tienePermiso('caja:escribir') && catalogoValido('nombre_categoria_gasto');
+      allow update: if tienePermiso('caja:modificar') && catalogoValido('nombre_categoria_gasto');
+      allow delete: if tienePermiso('caja:eliminar');
+    }
+
+    match /metodos_pago/{id} {
+      // Quien cobra una comanda necesita ver las opciones
+      allow read: if esEmpleado();
+      allow create: if tienePermiso('caja:escribir') && catalogoValido('nombre_metodo_pago');
+      allow update: if tienePermiso('caja:modificar') && catalogoValido('nombre_metodo_pago');
+      allow delete: if tienePermiso('caja:eliminar');
+    }
+
+    match /cajas/{id} {
+      allow read: if tienePermiso('caja:leer');
+      // Una caja nueva empieza abierta y a nombre de quien la abre
+      allow create: if tienePermiso('caja:escribir')
+        && request.resource.data.id_caja == id
+        && request.resource.data.estado_caja == 'abierto'
+        && request.resource.data.total_egresos == 0
+        && request.resource.data.saldo_inicial is number
+        && request.resource.data.saldo_inicial >= 0
+        && request.resource.data.empleado_apertura == miUsuario().id_empleado
+        && getAfter(/databases/$(database)/documents/contadores/cajas).data.abierta == id;
+      // Una caja cerrada ya no cambia, y sus datos de apertura tampoco
+      allow update: if resource.data.estado_caja == 'abierto'
+        && ((tienePermiso('caja:modificar')
+            && soloCambia(['saldo_esperado', 'saldo_contado', 'diferencia_caja', 'observaciones_arqueo',
+                           'empleado_arqueo_nombre', 'fecha_arqueo', 'estado_caja', 'fecha_cierre',
+                           'empleado_cierre_nombre', 'saldo_final', 'observaciones_cierre'])
+            && request.resource.data.estado_caja in ['abierto', 'cerrado'])
+          // Registrar, editar o eliminar un gasto actualiza el total
+          || ((tienePermiso('caja:escribir') || tienePermiso('caja:modificar') || tienePermiso('caja:eliminar'))
+            && soloCambia(['total_egresos'])
+            && request.resource.data.total_egresos >= 0));
+      allow delete: if false;
+    }
+
+    // Numeración de las cajas, y cuál está abierta. Solo puede haber una.
+    match /contadores/cajas {
+      allow read: if tienePermiso('caja:leer') || tienePermiso('caja:escribir');
+      allow create: if tienePermiso('caja:escribir')
+        && request.resource.data.ultimo == 1
+        && request.resource.data.abierta == '1';
+      // Abrir: solo si no hay otra abierta. Cerrar: deja el contador sin caja abierta.
+      allow update: if (tienePermiso('caja:escribir')
+          && resource.data.abierta == null
+          && request.resource.data.ultimo == resource.data.ultimo + 1
+          && request.resource.data.abierta == string(request.resource.data.ultimo))
+        || (tienePermiso('caja:modificar')
+          && request.resource.data.ultimo == resource.data.ultimo
+          && request.resource.data.abierta == null);
+    }
+
+    match /gastos/{id} {
+      allow read: if tienePermiso('caja:leer');
+      // Solo en una caja abierta, y a nombre de quien lo registra
+      allow create: if tienePermiso('caja:escribir')
+        && gastoValido()
+        && request.resource.data.id_gasto == id
+        && request.resource.data.empleado == miUsuario().id_empleado
+        && get(/databases/$(database)/documents/cajas/$(request.resource.data.caja)).data.estado_caja == 'abierto';
+      allow update: if tienePermiso('caja:modificar')
+        && gastoValido()
+        && soloCambia(['descripcion', 'monto', 'categoria', 'categoria_nombre'])
+        && get(/databases/$(database)/documents/cajas/$(resource.data.caja)).data.estado_caja == 'abierto';
+      allow delete: if tienePermiso('caja:eliminar')
+        && get(/databases/$(database)/documents/cajas/$(resource.data.caja)).data.estado_caja == 'abierto';
     }
 
     // Numeración de las comandas: solo puede avanzar de a uno

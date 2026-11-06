@@ -66,7 +66,7 @@ const SIN_NIVEL_EMPLEADO = "No podés gestionar a un empleado con un nivel de ac
 const SIN_NIVEL_CARGO = "No podés asignar un cargo con un nivel de acceso igual o superior al tuyo.";
 
 // Fecha de hoy según el teléfono. Ejemplo: 2026-11-06
-function hoy() {
+export function hoy() {
   const ahora = new Date();
   const mes = String(ahora.getMonth() + 1).padStart(2, "0");
   const dia = String(ahora.getDate()).padStart(2, "0");
@@ -146,6 +146,47 @@ export function cambiarContrasenaObligatoria(actual, nueva) {
     await updateDoc(doc(db, "usuarios", usuario.email.toLowerCase()), {
       debe_cambiar_contrasena: false,
     });
+  });
+}
+
+// Cambio voluntario: pide la contraseña actual y queda registrado en la auditoría
+export function cambiarMiContrasena(actual, nueva) {
+  return conMensajeDeCuenta(async () => {
+    const problema = validarClaveSegura(nueva);
+    if (problema) throw new Error(problema);
+    if (actual === nueva) throw new Error("La nueva contraseña debe ser distinta de la actual.");
+    const usuario = auth.currentUser;
+    const yo = await obtenerUsuarioActual();
+    await reauthenticateWithCredential(usuario, EmailAuthProvider.credential(usuario.email, actual));
+    await updatePassword(usuario, nueva);
+    const lote = writeBatch(db);
+    auditar(lote, yo, {
+      tabla: "Empleado",
+      accion: "MODIFICAR",
+      registro: yo.id_empleado,
+      actual: "Cambió su propia contraseña",
+    });
+    await lote.commit();
+  });
+}
+
+// Cada persona solo puede cambiar su propio teléfono
+export function actualizarMiTelefono(telefono) {
+  return conMensaje(async () => {
+    const limpio = (telefono || "").trim();
+    if (limpio && !/^[0-9+()\s-]{6,20}$/.test(limpio)) throw new Error("Ingresá un teléfono válido.");
+    const yo = await obtenerUsuarioActual();
+    const lote = writeBatch(db);
+    lote.update(doc(db, "usuarios", yo.correo), { telefono: limpio || null });
+    lote.update(doc(db, "empleados", yo.id_empleado), { telefono: limpio || null });
+    auditar(lote, yo, {
+      tabla: "Empleado",
+      accion: "MODIFICAR",
+      registro: yo.id_empleado,
+      anterior: `Teléfono: ${yo.telefono || ""}`,
+      actual: `Teléfono: ${limpio}`,
+    });
+    await lote.commit();
   });
 }
 

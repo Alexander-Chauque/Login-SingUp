@@ -5,7 +5,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { obtenerPermisos } from "../src/config/firestore";
 import { obtenerReportes, PERIODOS } from "../src/config/reportes";
-import { formatearDinero } from "../src/utils/ayudas";
+import { formatearDinero, mostrarAviso } from "../src/utils/ayudas";
+import { compartirPDF } from "../src/utils/exportar";
 import { COLORS } from "../styles/colors";
 import { gestionStyles as g } from "../styles/gestionStyles";
 import { EncabezadoPagina, PanelFiltros } from "./ComponentesSistema";
@@ -77,6 +78,7 @@ export default function Reportes() {
   const [datos, setDatos] = useState(null);
   const [permitido, setPermitido] = useState(true);
   const [error, setError] = useState("");
+  const [exportando, setExportando] = useState(false);
 
   const cargar = useCallback(async () => {
     try {
@@ -97,6 +99,43 @@ export default function Reportes() {
       cargar();
     }, [cargar]),
   );
+
+  const exportar = async () => {
+    setExportando(true);
+    try {
+      const filas = (lista, conCantidad) =>
+        lista.map((fila) => [fila.nombre, conCantidad ? `${fila.total} u.` : formatearDinero(fila.total)]);
+      await compartirPDF("Reportes", `Período: ${PERIODOS.find((p) => p.valor === periodo).nombre}`, [
+        {
+          titulo: "Resumen de ventas",
+          columnas: ["Concepto", "Valor"],
+          filas: [
+            ["Ventas totales", formatearDinero(datos.ventas.total)],
+            ["Comandas cobradas", datos.ventas.cantidad],
+            ["Ticket promedio", formatearDinero(datos.ventas.ticket)],
+          ],
+        },
+        {
+          titulo: "Ventas por día",
+          columnas: ["Día", "Total"],
+          filas: datos.ventas.porDia.map((fila) => [fechaCorta(fila.dia), formatearDinero(fila.total)]),
+        },
+        { titulo: "Platos más vendidos", columnas: ["Plato", "Cantidad"], filas: filas(datos.topPlatos, true) },
+        { titulo: "Bebidas más vendidas", columnas: ["Bebida", "Cantidad"], filas: filas(datos.topBebidas, true) },
+        { titulo: "Ingresos por categoría", columnas: ["Categoría", "Total"], filas: filas(datos.categorias) },
+        {
+          titulo: "Ventas por mozo",
+          columnas: ["Mozo", "Comandas", "Total"],
+          filas: datos.mozos.map((m) => [m.nombre, m.cantidad, formatearDinero(m.total)]),
+        },
+        { titulo: "Cobrado por método de pago", columnas: ["Método", "Total"], filas: filas(datos.metodos) },
+      ]);
+    } catch (e) {
+      mostrarAviso("No se pudo exportar", e.message);
+    } finally {
+      setExportando(false);
+    }
+  };
 
   if (!permitido) {
     return (
@@ -184,6 +223,13 @@ export default function Reportes() {
 
       {datos && seccion === "metodos" ? (
         <Barras titulo="Cobrado por método de pago" filas={datos.metodos} texto={enPesos} />
+      ) : null}
+
+      {datos ? (
+        <TouchableOpacity style={[g.botonSecundario, exportando && g.botonDesactivado]} onPress={exportar} disabled={exportando}>
+          <MaterialIcons name="picture-as-pdf" size={18} color="#333333" />
+          <Text style={g.botonSecundarioTexto}>{exportando ? "Preparando..." : "Exportar todo a PDF"}</Text>
+        </TouchableOpacity>
       ) : null}
     </ScrollView>
   );

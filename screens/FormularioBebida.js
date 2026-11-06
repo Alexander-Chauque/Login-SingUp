@@ -29,7 +29,8 @@ export default function FormularioBebida({ route, navigation }) {
           listarTiposBebida(),
           id ? obtenerProducto("bebida", id) : null,
         ]);
-        setTipos(listaTipos);
+        // Se ofrecen los activos y el que la bebida ya usa
+        setTipos(listaTipos.filter((t) => t.estado_tipo_bebida || t.id_tipo_bebida === bebida?.id_tipo_bebida));
         if (bebida) {
           setNombre(bebida.nombre_bebida);
           setPrecio(String(Number(bebida.precio_bebida)));

@@ -5,7 +5,8 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 import { obtenerPermisos } from "../src/config/firestore";
 import { listarAuditoria } from "../src/config/reportes";
-import { formatearFecha, normalizar } from "../src/utils/ayudas";
+import { formatearFecha, mostrarAviso, normalizar } from "../src/utils/ayudas";
+import { compartirPDF } from "../src/utils/exportar";
 import { COLORS } from "../styles/colors";
 import { gestionStyles as g } from "../styles/gestionStyles";
 import { EncabezadoPagina, PanelFiltros } from "./ComponentesSistema";
@@ -43,6 +44,7 @@ export default function Auditoria() {
   const [busqueda, setBusqueda] = useState("");
   const [tabla, setTabla] = useState("Todas");
   const [accion, setAccion] = useState("Todas");
+  const [exportando, setExportando] = useState(false);
 
   const cargar = useCallback(async () => {
     try {
@@ -80,6 +82,31 @@ export default function Auditoria() {
       ).includes(texto);
     });
   }, [registros, tabla, accion, busqueda]);
+
+  // Exporta lo que está filtrado en pantalla
+  const exportar = async () => {
+    setExportando(true);
+    try {
+      await compartirPDF("Auditoría", `${visibles.length} registros`, [
+        {
+          titulo: "Registro de cambios",
+          columnas: ["Fecha", "Usuario", "Tabla", "Acción", "Antes", "Ahora"],
+          filas: visibles.map((r) => [
+            formatearFecha(r.fecha_hora),
+            r.empleado_nombre,
+            `${r.tabla} #${r.registro_id}`,
+            r.accion,
+            r.valores_anteriores,
+            r.valores_actuales,
+          ]),
+        },
+      ]);
+    } catch (e) {
+      mostrarAviso("No se pudo exportar", e.message);
+    } finally {
+      setExportando(false);
+    }
+  };
 
   if (!permitido) {
     return (
@@ -146,7 +173,12 @@ export default function Auditoria() {
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
           <View>
-            <EncabezadoPagina icono="history" titulo="Auditoría" subtitulo="Registro de los cambios del sistema" />
+            <EncabezadoPagina icono="history" titulo="Auditoría" subtitulo="Registro de los cambios del sistema">
+              <TouchableOpacity style={[g.botonSecundario, exportando && g.botonDesactivado]} onPress={exportar} disabled={exportando}>
+                <MaterialIcons name="picture-as-pdf" size={18} color="#333333" />
+                <Text style={g.botonSecundarioTexto}>{exportando ? "Preparando..." : "Exportar a PDF"}</Text>
+              </TouchableOpacity>
+            </EncabezadoPagina>
             <PanelFiltros>
               <View style={g.buscador}>
                 <Ionicons name="search" size={18} color="#9CA3AF" />

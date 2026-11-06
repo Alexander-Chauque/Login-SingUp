@@ -5,7 +5,7 @@ import { inventoryStyles as styles } from '../styles/inventoryStyles';
 import { COLORS } from '../styles/colors';
 import { EncabezadoPagina } from './ComponentesSistema';
 
-// Las tres categorías del inventario: cada una abre su propia pantalla
+// Las secciones del inventario: cada una abre su propia pantalla
 const CATEGORIAS = [
   {
     titulo: 'Platos',
@@ -27,6 +27,20 @@ const CATEGORIAS = [
     icono: 'eco',
     imagen: require('../assets/inventario/ingredientes.jpg'),
     destino: ['ListaIngredientes'],
+  },
+  {
+    titulo: 'Categorías de platos',
+    texto: 'Gestiona las categorías que agrupan los platos.',
+    icono: 'category',
+    imagen: require('../assets/inventario/platos.jpg'),
+    destino: ['ListaCatalogo', { tipo: 'categoria' }],
+  },
+  {
+    titulo: 'Tipos de bebida',
+    texto: 'Gestiona los tipos que agrupan las bebidas.',
+    icono: 'liquor',
+    imagen: require('../assets/inventario/bebidas.jpg'),
+    destino: ['ListaCatalogo', { tipo: 'tipoBebida' }],
   },
 ];
 

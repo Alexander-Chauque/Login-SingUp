@@ -43,7 +43,10 @@ export default function FormularioPlato({ route, navigation }) {
           listarIngredientes(),
           id ? obtenerProducto("plato", id) : null,
         ]);
-        setCategorias(listaCategorias);
+        // Se ofrecen las activas y la que el plato ya usa
+        setCategorias(
+          listaCategorias.filter((c) => c.estado_categoria_plato || c.id_categoria_plato === plato?.categoria),
+        );
         setIngredientes(listaIngredientes);
         if (plato) {
           const ids = new Set(plato.ingredientes.map((i) => i.id_ingrediente));

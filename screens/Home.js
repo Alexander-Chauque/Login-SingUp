@@ -120,6 +120,10 @@ export default function Home({ navigation }) {
             <MaterialIcons name="point-of-sale" size={24} color={COLORS.naranja} />
             <Text style={styles.gridText}>Ventas</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Finanzas')}>
+            <MaterialIcons name="account-balance-wallet" size={24} color={COLORS.naranja} />
+            <Text style={styles.gridText}>Finanzas</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.gridItem} onPress={() => navigation.navigate('Reportes')}>
             <MaterialIcons name="bar-chart" size={24} color={COLORS.naranja} />
             <Text style={styles.gridText}>Reportes</Text>

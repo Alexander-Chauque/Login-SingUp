@@ -182,6 +182,10 @@ export default function ListaEmpleados({ navigation }) {
                   <Text style={g.botonSecundarioTexto}>Cargos y permisos</Text>
                 </TouchableOpacity>
               ) : null}
+              <TouchableOpacity style={g.botonSecundario} onPress={() => navigation.navigate("ListaAsistencias")}>
+                <MaterialIcons name="event-available" size={18} color="#333333" />
+                <Text style={g.botonSecundarioTexto}>Asistencias</Text>
+              </TouchableOpacity>
             </EncabezadoPagina>
 
             <PanelFiltros>

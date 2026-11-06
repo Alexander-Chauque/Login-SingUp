@@ -12,7 +12,7 @@ export const PERIODOS = [
 ];
 
 // Devuelve el primer milisegundo del período, según la fecha del teléfono
-function inicioDelPeriodo(periodo, ahora = new Date()) {
+export function inicioDelPeriodo(periodo, ahora = new Date()) {
   if (periodo === "todo") return 0;
   if (periodo === "mes") return new Date(ahora.getFullYear(), ahora.getMonth(), 1).getTime();
   const inicio = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
